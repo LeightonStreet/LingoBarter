@@ -1,9 +1,9 @@
-from flask import Flask
-app = Flask(__name__)
+"""
+    The main file, start our application here
+"""
+from barter import app
 
-@app.route('/')
-def hello_world():
-    return 'Hello World!'
+__author__ = "He Li"
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
