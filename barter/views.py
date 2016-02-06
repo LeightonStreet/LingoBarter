@@ -51,6 +51,10 @@ def logout():
     return redirect('login')
 
 
-@app.route('/<username>')
-def homepage():
-    pass
+@app.route('/<username>', methods=['POST', 'GET'])
+def homepage(username):
+    if not session.get('username'):
+        return redirect('login')
+    if request.method == 'POST':
+        pass
+    return render_template('user.html', username=username)
