@@ -1,14 +1,17 @@
 <!doctype html>
 <title>Lingo Barter: for language exchange</title>
 <div class="page">
-  <h1>Login to Lingo Barter</h1>
+  <h1>Signup to Lingo Barter</h1>
   {% if error %}<p class="error"><strong>Error:</strong> {{ error }}{% endif %}
-  <form action="{{ url_for('login') }}" method="post">
+  <form action="{{ url_for('signup') }}" method="post">
       <label>Email:</label>
       <input type="text" name="email">
+      <label>Username:</label>
+      <input type="text" name="username">
       <label>Password:</label>
       <input type="password" name="password">
-      <input type="submit" value="Login">
+      <label>Password Again:</label>
+      <input type="password" name="confirm">
+      <input type="submit" value="Signup">
   </form>
-  <p>Don't have an account? Sign up <a href="{{ url_for('signup') }}">here</a></p>
 </div>

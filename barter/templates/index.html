@@ -1,0 +1,12 @@
+<!doctype html>
+<title>Lingo Barter: for language exchange</title>
+<div class="page">
+    <h1>Welcome to Lingo Barter</h1>
+    <a href="{{ url_for('logout') }}">log out</a>
+    <ul>
+    {% for user in users %}
+        <li>{{ user.username }}</li>
+    {% endfor %}
+    </ul>
+</ul>
+</div>

@@ -8,14 +8,17 @@ from flask import request
 
 @app.route('/')
 def index():
-    return str([u.username for u in fetch_all_users()]) + session['username']
+    if not session.get('username'):
+        return redirect(url_for('login'))
+    else:
+        return render_template('index.html', users=fetch_all_users())
 
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     error = None
-    form = LoginForm(request.form)
     if request.method == 'POST':
+        form = LoginForm(request.form)
         m = md5()
         m.update(form.password.data)
         u = User.objects(email=form.email.data, password=m.hexdigest())
@@ -28,17 +31,24 @@ def login():
     return render_template('login.html', error=error)
 
 
-@app.route('/signup')
+@app.route('/signup', methods=['POST', 'GET'])
 def signup():
-    succeed = signup_user(email=request.args.get('email'),
-                          username=request.args.get('username'),
-                          password=request.args.get('password'))
-    return str(succeed)
+    error = None
+    if request.method == 'POST':
+        form = RegistrationForm(request.form)
+        m = md5()
+        m.update(form.password.data)
+        ret, error = signup_user(email=form.email.data, password=m.hexdigest(), username=form.username.data)
+        if ret:
+            session['username'] = form.username.data
+            return redirect(url_for('index'))
+    return render_template('signup.html', error=error)
 
 
 @app.route('/logout')
 def logout():
-    pass
+    del session['username']
+    return redirect('login')
 
 
 @app.route('/<username>')

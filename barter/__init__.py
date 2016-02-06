@@ -16,6 +16,7 @@ app.config['MONGODB_SETTINGS'] = {
     'host': '127.0.0.1',
     'port': 27017
 }
+app.secret_key = 'F12Zr47j\3yX R~X@H!jmM]Lwf/,?KT'
 db.init_app(app)
 
 import barter.views
