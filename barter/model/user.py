@@ -11,7 +11,7 @@ class User(db.Document):
     nickname = db.StringField(max_length=50)
     nationality = db.StringField(max_length=50)
     location = db.StringField(max_length=50)
-    sex = db.BinaryField(max_bytes=2)
+    sex = db.int(min_value=1, max_value=3)
     age = db.IntField(min_value=0, max_value=150)
     introduction = db.StringField(max_length=500)
     teach_lan = db.ListField(field=db.StringField)
