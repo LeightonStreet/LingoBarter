@@ -16,3 +16,4 @@ class User(db.Document):
     introduction = db.StringField(max_length=500)
     teach_lan = db.ListField(field=db.StringField)
     learn_lan = db.ListField(field=db.StringField)
+    profile_completed = db.BooleanField()
