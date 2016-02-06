@@ -1,27 +1,13 @@
 <!doctype html>
-<title>Flaskr</title>
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+<title>Lingo Barter: for language exchange</title>
 <div class="page">
-  <h1>LingoBarter</h1>
-  <div class="metanav">
-  {% if not session.logged_in %}
-    <a href="{{ url_for('index') }}">log in</a>
-  {% else %}
-    <a href="{{ url_for('index') }}">log out</a>
-  {% endif %}
-  </div>
-  {% for message in get_flashed_messages() %}
-    <div class="flash">{{ message }}</div>
-  {% endfor %}
-  <h2>Login</h2>
+  <h1>Login to Lingo Barter</h1>
   {% if error %}<p class="error"><strong>Error:</strong> {{ error }}{% endif %}
-  <form action="{{ url_for('index') }}" method="post">
-    <dl>
-      <dt>Username:
-      <dd><input type="text" name="username">
-      <dt>Password:
-      <dd><input type="password" name="password">
-      <dd><input type="submit" value="Login">
-    </dl>
+  <form action="{{ url_for('login') }}" method="post">
+      <label>Username:</label>
+      <input type="text" name="email">
+      <label>Password:</label>
+      <input type="password" name="password">
+      <input type="submit" value="Login">
   </form>
 </div>
