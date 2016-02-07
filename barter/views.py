@@ -55,6 +55,21 @@ def logout():
 def homepage(username):
     if not session.get('username'):
         return redirect('login')
+    error = None
+    u = None
     if request.method == 'POST':
-        pass
-    return render_template('user.html', username=username)
+        form = UserForm(request.form)
+        u = update_user(nickname=form.nickname.data,
+                        nationality=form.nationality.data,
+                        location=form.location.data,
+                        sex=form.sex.data,
+                        age=form.age.data,
+                        introduction=form.introduction.data,
+                        teach_lan=form.teach_lan.data,
+                        learn_lan=form.learn_lan.data,
+                        username=session['username'])
+        if u:
+            error = "Update successfully"
+        else:
+            error = "Error occurred"
+    return render_template('user.html', error=error, user=u)

@@ -32,8 +32,11 @@ def logout_user():
 # complete user profile
 # user has already logged in
 # username, nickname, nationality, location, sex, age, introduction, teach_lan, learn_lan
-def update_user(**kwargs)
-    u = User.objects(email=kwargs['username'])[0]
+def update_user(**kwargs):
+    try:
+        u = User.objects(email=kwargs['username'])[0]
+    except:
+        return None
 
     u.nickname = kwargs['nickname']
     u.nationality = kwargs['nationality']
@@ -45,4 +48,4 @@ def update_user(**kwargs)
     u.learn_lan = kwargs['learn_lan']
     u.profile_completed = True
     u.save()
-
+    return u
