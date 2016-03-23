@@ -1,9 +1,2 @@
 #!/bin/bash
-# This script runs only for quokka cms official demo page
-if [ "$OPENSHIFT_NAMESPACE" == "lingobarter" ]; then
-   source ${OPENSHIFT_PYTHON_DIR}virtenv/bin/activate
-   export PYTHON_EGG_CACHE=${OPENSHIFT_PYTHON_DIR}virtenv/lib/python-2.7/site-packages
-
-   cd $OPENSHIFT_REPO_DIR
-   export PYTHONPATH=$PWD
-fi
+# This script runs only for lingobarter cms official demo page
