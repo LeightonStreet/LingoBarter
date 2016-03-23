@@ -222,7 +222,7 @@ MEDIA_VIDEO_ALLOWED_EXTENSIONS = ('avi', 'mp4', 'mpeg')
 MEDIA_FILE_ALLOWED_EXTENSIONS = ('pdf', 'txt', 'doc', 'docx', 'xls', 'xmlsx')
 
 """
-Quokka-Themes checks `THEME_PATHS` configuration variable to find
+Lingobarter-Themes checks `THEME_PATHS` configuration variable to find
 directories that contain themes. The theme's identifier in info.json
 must match the name of its directory.
 """
