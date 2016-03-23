@@ -1,5 +1,5 @@
 import logging
-from flask import current_app, request
+from flask import current_app
 from lingobarter.core.db import db
 from lingobarter.core.app import LingobarterApp
 

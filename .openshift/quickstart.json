@@ -1,0 +1,13 @@
+{
+    "name": "Lingobarter",
+    "website": "http://leightonstreet.github.io/LingoBarter/",
+    "version": "0.1",
+    "initial_git_url": "https://github.com/LeightonStreet/LingoBarter.git",
+    "cartridges": ["python-2.7", "mongo-2.4"],
+    "tags": [
+        "language",
+        "mongo",
+        "python"
+    ],
+    "summary": "Lingobarter is a Language Exchange made with Python, Flask and MongoDB"
+}
