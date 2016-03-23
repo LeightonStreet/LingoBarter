@@ -57,21 +57,21 @@ pip install -r requirements/requirements.txt
 
     3. Create a superuser  (required to login on admin interface)
         ```bash
-        $ python manage.py accounts_createsuperuser
+        $ python lingo.py accounts_createsuperuser
         you@email.com
         P4$$W0Rd
         ```
 
     4. Populate with sample data (optional if you want sample data for testing)
         ```bash
-        $ python manage.py populate
+        $ python lingo.py populate
 
         ```
         > credentials for /admin will be email: admin@example.com passwd: admin
 
     5. Run
         ```bash
-        $ python manage.py runserver --host 0.0.0.0 --port 5000
+        $ python lingo.py runserver --host 0.0.0.0 --port 5000
         ```
         - Site on [http://localhost:5000](http://localhost:5000)
         - Admin on [http://localhost:5000/admin](http://localhost:5000/admin)
