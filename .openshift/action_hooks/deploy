@@ -16,6 +16,3 @@ export PYTHONPATH=$PWD
 
 echo "installing requirements"
 pip install -r requirements/requirements.txt --upgrade
-
-echo "installing test requirements"
-pip install -r requirements/development.txt --upgrade
