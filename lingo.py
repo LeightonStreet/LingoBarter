@@ -40,13 +40,10 @@ def shell(ipython):
     _vars.update(dict(app=app, db=db))
     readline.set_completer(rlcompleter.Completer(_vars).complete)
     readline.parse_and_bind("tab: complete")
-    try:
-        if ipython is True:
-            from IPython import start_ipython
-            start_ipython(argv=[], user_ns=_vars)
-        else:
-            raise ImportError
-    except ImportError:
+    if ipython is True:
+        from IPython import start_ipython
+        start_ipython(argv=[], user_ns=_vars)
+    else:
         bash = code.InteractiveConsole(_vars)
         bash.interact()
 
@@ -69,6 +66,8 @@ def showconfig():
     from pprint import pprint
     print("Config.")
     pprint(dict(app.config.store))
+
+# TODO: put populate and populate_reset here
 
 
 @core_cmd.command()

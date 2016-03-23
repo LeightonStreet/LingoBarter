@@ -70,11 +70,11 @@ Default configuration for FLask-Admin instance
 :name: - will be the page title
 :url: - is the ending point
 """
-ADMIN = {'name': 'lingobarter admin', 'url': '/admin'}
+ADMIN = {'name': 'Lingobarter admin', 'url': '/admin'}
 
 """
 File admin can expose folders, you just need to have them
-mapped in your server or in flask, see quooka.ext.views
+mapped in your server or in flask, see lingobarter.ext.views
 """
 
 DEFAULT_EDITABLE_EXTENSIONS = (
@@ -222,7 +222,7 @@ MEDIA_VIDEO_ALLOWED_EXTENSIONS = ('avi', 'mp4', 'mpeg')
 MEDIA_FILE_ALLOWED_EXTENSIONS = ('pdf', 'txt', 'doc', 'docx', 'xls', 'xmlsx')
 
 """
-Lingobarter-Themes checks `THEME_PATHS` configuration variable to find
+Quokka-Themes checks `THEME_PATHS` configuration variable to find
 directories that contain themes. The theme's identifier in info.json
 must match the name of its directory.
 """
@@ -291,7 +291,7 @@ SHORTENER_SETTINGS = {"name": "BitlyShortener",
                       "bitly_api_key": "R_7d84f09c68be4c749cac2a56ace2e73f",
                       "bitly_token":
                       "9964d1f9c8c8b4215f7690449f0980c4fe1a6906",
-                      "bitly_login": "lingobarterbitly"}
+                      "bitly_login": "quokkabitly"}
 
 
 """
@@ -316,7 +316,7 @@ OPBEAT = {
     'ORGANIZATION_ID': '<ORGANIZATION-ID>',
     'APP_ID': '<APP-ID>',
     'SECRET_TOKEN': '<SECRET-TOKEN>',
-    'INCLUDE_PATHS': ['lingobarter'],
+    'INCLUDE_PATHS': ['quokka'],
     'DEBUG': True,
     'LOGGING': False
 }
