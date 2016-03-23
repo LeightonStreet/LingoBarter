@@ -14,6 +14,7 @@ def parse_conf_data(data):
     export LINGOBARTER_PAGINATION_PER_PAGE='@int 20'
     export LINGOBARTER_MONGODB_SETTINGS='@json {"DB": "lingobarter_db", "HOST": "mongo"}'
     export LINGOBARTER_ALLOWED_EXTENSIONS='@json ["jpg", "png"]'
+    :param data:
     """
     import json
     true_values = ('t', 'true', 'enabled', '1', 'on', 'yes')

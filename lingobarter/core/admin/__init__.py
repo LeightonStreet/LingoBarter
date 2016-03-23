@@ -3,9 +3,11 @@
 from flask.ext.admin import Admin
 
 
+# default admin first
 class LingobarterAdmin(Admin):
-    registered = []
+    pass
 
 
+# create admin
 def create_admin(app=None):
-    return LingobarterAdmin(app)
+    return LingobarterAdmin(app, name='Lingobarter', template_mode='bootstrap3')

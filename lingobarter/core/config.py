@@ -15,6 +15,8 @@ class LingobarterConfig(Config):
     def store(self):
         return dict(self)
 
+    # TODO: configurations from database... from mongodb, or redis
+
     def __getitem__(self, key):
         return dict.__getitem__(self, key)
 
@@ -46,7 +48,9 @@ class LingobarterConfig(Config):
             raise
 
     def load_lingobarter_config(self, config=None, mode=None, test=None, **sets):
+        # first load from global settings object
         self.from_object(config or 'lingobarter.settings')
+        # then load from local or test settings
         mode = mode or 'test' if test else os.environ.get(
             'LINGOBARTER_MODE', 'local')
         self.from_object('lingobarter.%s_settings' % mode, silent=True)

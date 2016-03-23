@@ -19,6 +19,7 @@ def load_from_folder(app):
         Bulk of the code taken from:
             https://github.com/smartboyathome/
                Cheshire-Engine/blob/master/ScoringServer/utils.py
+        :param app:
     """
     blueprints_path = app.config.get('BLUEPRINTS_PATH', 'modules')
     path = os.path.join(

@@ -1,11 +1,12 @@
 from flask import Flask, Blueprint
+# noinspection PyProtectedMember
 from flask.helpers import _endpoint_from_view_func
 from lingobarter.core.config import LingobarterConfig
 
 
 class LingobarterApp(Flask):
     """
-    Implementes customizations on Flask
+    Implements customizations on Flask
     - Config handler
     - Aliases dispatching before request
     """
