@@ -6,3 +6,4 @@ services: mongodb
 install:
   - "pip install --upgrade -r requirements/requirements.txt"
   - "pip install --upgrade -r requirements/testing.txt"
+script: python lingo.py check

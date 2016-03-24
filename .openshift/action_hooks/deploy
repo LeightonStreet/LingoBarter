@@ -18,4 +18,4 @@ echo "installing requirements"
 pip install -r requirements/requirements.txt --upgrade
 
 echo "installing development requirements"
-pip install -r requirements/development.txt --upgrade
+sudo pip install -r requirements/development.txt --upgrade
