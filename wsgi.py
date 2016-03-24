@@ -14,7 +14,7 @@ application = app = activate(application)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run Quokka App for WSGI")
+    parser = argparse.ArgumentParser(description="Run Lingobarter App for WSGI")
     parser.add_argument('-p', '--port', help='App Port')
     parser.add_argument('-i', '--host', help='App Host')
     parser.add_argument('-r', '--reloader', action='store_true',
