@@ -3,7 +3,7 @@
 
 import json
 from lingobarter.core.db import db
-from flask.ext.babel import lazy_gettext
+from flask.ext.babelex import lazy_gettext
 
 
 def default_formatter(value):

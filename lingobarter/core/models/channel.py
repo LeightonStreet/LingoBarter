@@ -3,7 +3,7 @@
 
 import logging
 from flask.ext.mistune import markdown
-from flask.ext.babel import lazy_gettext
+from flask.ext.babelex import lazy_gettext
 
 from lingobarter.core.db import db
 from lingobarter.core.models.custom_values import HasCustomValue

@@ -47,5 +47,6 @@ class Config(HasCustomValue, ContentFormat, Publishable, db.DynamicDocument):
         return self.group
 
 
-class Quokka(Dated, Slugged, db.DynamicDocument):
+class Lingobarter(Dated, Slugged, db.DynamicDocument):
     """ Hidden collection for installation control"""
+    pass

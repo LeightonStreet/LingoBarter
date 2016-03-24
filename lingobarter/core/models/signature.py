@@ -4,7 +4,7 @@
 import datetime
 import random
 from flask import current_app
-from flask.ext.babel import lazy_gettext
+from flask.ext.babelex import lazy_gettext
 from lingobarter.core import TEXT_FORMATS
 from lingobarter.core.db import db
 from lingobarter.modules.accounts.models import User

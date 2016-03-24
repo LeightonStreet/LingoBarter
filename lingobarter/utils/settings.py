@@ -1,5 +1,5 @@
 import logging
-from lingobarter.core.models import config
+import lingobarter.core.models as m
 from flask import current_app, request
 from lingobarter.core.db import db
 from lingobarter.core.app import LingobarterApp
@@ -15,7 +15,7 @@ def create_app_min(config=None, test=False):
 
 def get_site_url():
     try:
-        from_site_config = config.Config.get('site', 'site_domain', None)
+        from_site_config = m.config.Config.get('site', 'site_domain', None)
         from_settings = get_setting_value('SERVER_NAME', None)
         if from_settings and not from_settings.startswith('http'):
             from_settings = 'http://%s/' % from_settings
