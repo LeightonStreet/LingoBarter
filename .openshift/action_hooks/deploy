@@ -1,6 +1,6 @@
 #!/bin/bash
-# This script will copy openshift_settings to quokka/local_settings
-# after the first deploy, make your settings changes only on quokka/local_settings.py
+# This script will copy openshift_settings to lingobarter/local_settings
+# after the first deploy, make your settings changes only on lingobarter/local_settings.py
 cd $OPENSHIFT_REPO_DIR
 cp etc/openshift_settings.py lingobarter/local_settings.py
 

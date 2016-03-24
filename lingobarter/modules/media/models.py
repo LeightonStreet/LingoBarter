@@ -30,7 +30,7 @@ class Media(MediaController, Content):
     def full_path(self):
         return Markup(
             "<a target='_blank' href='{full}'>{path}</a>".format(
-                full=url_for('quokka.core.media', filename=self.path),
+                full=url_for('lingobarter.core.media', filename=self.path),
                 path=self.path
             )
         )

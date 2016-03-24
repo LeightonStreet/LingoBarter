@@ -85,7 +85,7 @@ class User(db.DynamicDocument, HasCustomValue, UserMixin):
             return self.avatar_url
         elif self.use_avatar_from == 'upload':
             return url_for(
-                'quokka.core.media', filename=self.avatar_file_path
+                'lingobarter.core.media', filename=self.avatar_file_path
             )
         elif self.use_avatar_from == 'facebook':
             try:

@@ -48,7 +48,7 @@ class ProfileEditView(MethodView):
                 'next',
                 request.values.get(
                     'next',
-                    url_for('quokka.modules.accounts.profile_edit')
+                    url_for('lingobarter.modules.accounts.profile_edit')
                 )
             )
             return redirect(url_for_security('login', next=nex))
@@ -93,7 +93,7 @@ class ProfileEditView(MethodView):
             flash('Profile saved!', 'alert')
             return redirect(
                 request.args.get('next') or
-                url_for('quokka.modules.accounts.profile_edit')
+                url_for('lingobarter.modules.accounts.profile_edit')
             )
         else:
             flash('Error ocurred!', 'alert error')  # form errors

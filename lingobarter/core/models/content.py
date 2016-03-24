@@ -86,7 +86,7 @@ class Content(HasCustomValue, Publishable, LongSlugged,
                     path = self.contents.get(identifier=item).content.path
                 else:
                     path = self.contents.get(identifier=item).content.thumb
-                return url_for('quokka.core.media', filename=path)
+                return url_for('lingobarter.core.media', filename=path)
             except Exception as e:
                 logger.warning('get_main_image_url:' + str(e))
 
@@ -117,7 +117,7 @@ class Content(HasCustomValue, Publishable, LongSlugged,
         absolute_url = absolute_url[1:]
         return u"{0}{1}".format(site_url, absolute_url)
 
-    def get_absolute_url(self, endpoint='quokka.core.detail'):
+    def get_absolute_url(self, endpoint='lingobarter.core.detail'):
         if self.channel.is_homepage:
             long_slug = self.slug
         else:
@@ -174,7 +174,7 @@ class Content(HasCustomValue, Publishable, LongSlugged,
     @property
     def module_name(self):
         module = self.__module__
-        module_name = module.replace('quokka.modules.', '').split('.')[0]
+        module_name = module.replace('lingobarter.modules.', '').split('.')[0]
         return module_name
 
     def heritage(self):

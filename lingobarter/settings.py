@@ -291,7 +291,7 @@ SHORTENER_SETTINGS = {"name": "BitlyShortener",
                       "bitly_api_key": "R_7d84f09c68be4c749cac2a56ace2e73f",
                       "bitly_token":
                       "9964d1f9c8c8b4215f7690449f0980c4fe1a6906",
-                      "bitly_login": "quokkabitly"}
+                      "bitly_login": "lingobarterbitly"}
 
 
 """
@@ -316,7 +316,7 @@ OPBEAT = {
     'ORGANIZATION_ID': '<ORGANIZATION-ID>',
     'APP_ID': '<APP-ID>',
     'SECRET_TOKEN': '<SECRET-TOKEN>',
-    'INCLUDE_PATHS': ['quokka'],
+    'INCLUDE_PATHS': ['lingobarter'],
     'DEBUG': True,
     'LOGGING': False
 }
