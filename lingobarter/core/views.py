@@ -9,7 +9,6 @@ logger = logging.getLogger()
 
 
 class ContentList(MethodView):
-
     def get(self):
         # default now, return homepage?
         return render_template("index.html")

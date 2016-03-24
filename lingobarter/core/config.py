@@ -1,8 +1,9 @@
-import os
 import logging
+
+import os
+from cached_property import cached_property
 from flask.config import Config
 from lingobarter.utils import parse_conf_data
-from cached_property import cached_property
 
 logger = logging.getLogger()
 
@@ -39,7 +40,7 @@ class LingobarterConfig(Config):
                 for key, data
                 in os.environ.items()
                 if key.startswith(namespace)
-            }
+                }
             self.update(data)
         except Exception as e:
             if silent:

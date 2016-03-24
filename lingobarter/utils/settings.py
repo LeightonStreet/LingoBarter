@@ -1,8 +1,9 @@
 import logging
+
 import lingobarter.core.models as m
 from flask import current_app, request
-from lingobarter.core.db import db
 from lingobarter.core.app import LingobarterApp
+from lingobarter.core.db import db
 
 logger = logging.getLogger()
 

@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
-from werkzeug.utils import secure_filename
 from flask import redirect, request, url_for, flash, current_app, render_template
+from flask.ext.mongoengine.wtf import model_form
+from flask.ext.security import current_user
+from flask.ext.security.utils import url_for_security
 from flask.views import MethodView
 from lingobarter.utils import get_current_user
 from lingobarter.utils.upload import lazy_media_path
-from flask.ext.security.utils import url_for_security
-from flask.ext.security import current_user
-from flask.ext.mongoengine.wtf import model_form
+from werkzeug.utils import secure_filename
 from .models import User
 
 

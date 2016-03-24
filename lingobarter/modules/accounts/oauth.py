@@ -36,7 +36,6 @@ def oauth_login(provider):
 
 
 def make_oauth_handler(provider):
-
     def oauth_handler(resp):
         app = current_app
         oauth_app = get_oauth_app(provider)
@@ -103,4 +102,5 @@ def make_oauth_handler(provider):
         ) or app.config.get('OAUTH_POST_LOGIN', "/")
 
         return redirect(_next)
+
     return oauth_handler

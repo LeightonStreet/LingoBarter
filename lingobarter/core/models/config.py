@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+
 from flask import current_app
 from lingobarter.core.db import db
 from lingobarter.core.fields import MultipleObjectsReturned

@@ -1,10 +1,9 @@
 # coding: utf-8
 from flask_mail import Mail
-from lingobarter.core.db import db
 from lingobarter.core.cache import cache
-
-from . import (generic, babel, blueprints, error_handlers, context_processors,
-               before_request, views, fixtures, oauthlib, security, development)
+from lingobarter.core.db import db
+from . import (generic, babel, blueprints, error_handlers, before_request,
+               views, fixtures, oauthlib, security, development)
 
 
 def configure_extensions(app, admin):
@@ -14,7 +13,6 @@ def configure_extensions(app, admin):
     Mail(app)
     error_handlers.configure(app)
     db.init_app(app)
-    context_processors.configure(app)
     security.configure(app, db)
     fixtures.configure(app, db)
     # blueprints.load_from_packages(app)

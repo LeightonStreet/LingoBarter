@@ -1,10 +1,8 @@
 # coding: utf-8
-import logging
 import json
+import logging
 import uuid
 
-from lingobarter.core.models.subcontent import SubContentPurpose
-from lingobarter.core.models.channel import Channel, ChannelType
 from lingobarter.core.models.config import Config, Lingobarter
 from lingobarter.core.models.custom_values import CustomValue
 from lingobarter.modules.accounts.models import User, Role
@@ -38,11 +36,6 @@ class Populate(object):
         self.load_existing_users()
         self.create_users()
         self.create_configs()
-        self.create_channel_types()
-        self.create_base_channels()
-        self.create_channels()
-        self.create_purposes()
-        self.create_posts()
 
     def generate_random_password(self):
         return uuid.uuid4().hex
@@ -136,7 +129,6 @@ class Populate(object):
         return value
 
     def create_configs(self):
-
         self.configs_data = self.json_data.get('configs')
 
         for config in self.configs_data:
@@ -144,108 +136,7 @@ class Populate(object):
                                 for args in config.get('values')]
             self.create_config(config)
 
-    def create_channel(self, data):
-
-        if 'childs' in data:
-            childs = data.pop('childs')
-        else:
-            childs = []
-
-        data['created_by'] = data['last_updated_by'] = self.users.get('admin')
-        _type = data.get('channel_type')
-        data['channel_type'] = self.channel_types.get(_type)
-
-        try:
-            channel = Channel.objects.get(slug=data.get('slug'))
-            created = False
-        except:
-            channel, created = Channel.objects.get_or_create(**data)
-
-        if created:
-            logger.info("Created channel: %s", channel.title)
-        else:
-            logger.info("Channel get: %s", channel.title)
-
-        for child in childs:
-            child['parent'] = channel
-            self.create_channel(child)
-
-        if channel.slug not in self.channels:
-            self.channels[channel.slug] = channel
-
-        return channel
-
-    def create_channel_type(self, data):
-        try:
-            channel_type = ChannelType.objects.get(
-                identifier=data.get('identifier'))
-            created = False
-        except:
-            channel_type, created = ChannelType.objects.get_or_create(
-                **data
-            )
-
-        if created:
-            logger.info("Created channel_type: %s", channel_type.title)
-        else:
-            logger.info("ChannelType get: %s", channel_type.title)
-
-        if channel_type.identifier not in self.channel_types:
-            self.channel_types[channel_type.identifier] = channel_type
-
-        return channel_type
-
-    def create_base_channels(self):
-        self.channel_data = self.json_data.get('base_channels')
-        for data in self.channel_data:
-            self.create_channel(data)
-
-    def create_channels(self):
-        self.channel_data = self.json_data.get('channels')
-        for data in self.channel_data:
-            self.create_channel(data)
-
-    def create_channel_types(self):
-        self.channel_type_data = self.json_data.get('channel_types')
-
-        for data in self.channel_type_data:
-            self.create_channel_type(data)
-
-    def create_purpose(self, data):
-        if data.get('identifier') in self.purposes:
-            return self.purposes[data.get('identifier')]
-
-        purpose, created = SubContentPurpose.objects.get_or_create(
-            title=data.get('title'),
-            identifier=data.get('identifier'),
-            module=data.get('module')
-        )
-
-        self.purposes[purpose.identifier] = purpose
-
-        return purpose
-
-    def create_purposes(self):
-        self.purpose_data = self.json_data.get('purposes')
-        for purpose in self.purpose_data:
-            self.create_purpose(purpose)
-
     def reset(self):
-        SubContentPurpose.objects(
-            identifier__in=[
-                item['identifier'] for item in self.json_data.get('purposes')
-            ]
-        ).delete()
-
-        for channel in Channel.objects(
-                slug__in=[
-                    item['slug'] for item in self.json_data.get('channels')]):
-            for subchannel in channel.get_children():
-                for subsubchannel in subchannel.get_children():
-                    subsubchannel.delete()
-                subchannel.delete()
-            channel.delete()
-
         User.objects(
             email__in=[item['email'] for item in self.json_data.get('users')]
         ).delete()

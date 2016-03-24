@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import logging
+
 import click
 from lingobarter import create_app
-from lingobarter.ext.blueprints import blueprint_commands
 from lingobarter.core.db import db
+from lingobarter.ext.blueprints import blueprint_commands
 
 # create lingobarter application
 app = create_app()
@@ -61,11 +62,44 @@ def check():
 
 
 @core_cmd.command()
+@click.option(
+    '-f',
+    '--filename',
+    help='Fixtures JSON path',
+    default='./etc/fixtures/initial_data.json')
+@click.option('-b', '--baseurl', help='base url to use', default=None)
+def populate(filename, baseurl=None):
+    """Populate the database with sample data
+    :param filename:
+    :param baseurl:
+    """
+    from lingobarter.utils.populate import Populate
+    Populate(db, filepath=filename, baseurl=baseurl, app=app)()
+
+
+@core_cmd.command()
+@click.option(
+    '-f',
+    '--filename',
+    help='Fixtures JSON path',
+    default='./etc/fixtures/initial_data.json')
+@click.option('-b', '--baseurl', help='base url to use', default=None)
+def populate_reset(filename, baseurl=None):
+    """De-Populate the database with sample data
+    :param filename:
+    :param baseurl:
+    """
+    from lingobarter.utils.populate import Populate
+    Populate(db, filepath=filename, baseurl=baseurl, app=app).reset()
+
+
+@core_cmd.command()
 def showconfig():
     """Print all config variables"""
     from pprint import pprint
     print("Config.")
     pprint(dict(app.config.store))
+
 
 # TODO: put populate and populate_reset here
 
@@ -83,6 +117,7 @@ def runserver(reloader, debug, host, port):
     :param port:
     """
     app.run(use_reloader=reloader, debug=debug, host=host, port=port)
+
 
 help_text = """
     Subcommands are loaded from the module/commands folder dynamically.

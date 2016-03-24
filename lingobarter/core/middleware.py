@@ -41,7 +41,7 @@ class HTTPMethodOverrideMiddleware(object):
 
     def _get_method_override(self, environ):
         return environ.get(self.header_name) or \
-            self._get_from_querystring(environ) or ''
+               self._get_from_querystring(environ) or ''
 
     def __call__(self, environ, start_response):
         method = self._get_method_override(environ).upper()

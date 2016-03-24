@@ -1,17 +1,23 @@
 #!/usr/bin/python
+"""
+wsgi.py
+=======
+This file is used by openshift, please use lingo.py
+to start lingobarter.
+"""
 
 import argparse
-from werkzeug.serving import run_simple
-from werkzeug.wsgi import DispatcherMiddleware
+
 from lingobarter import create_app, create_api
 from lingobarter.utils.paas import activate
+from werkzeug.serving import run_simple
+from werkzeug.wsgi import DispatcherMiddleware
 
 application = DispatcherMiddleware(create_app(), {
     '/api': create_api()
 })
 
 application = app = activate(application)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run Lingobarter App for WSGI")

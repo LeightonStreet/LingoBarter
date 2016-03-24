@@ -24,7 +24,6 @@ Take a look at Flask-Cache documentation
 """
 CACHE_TYPE = "simple"
 
-
 """
 Not needed by flask, but those root folders are used
 by FLask-Admin file manager and Media module
@@ -47,7 +46,6 @@ Files on MAP_STATIC_ROOT will be served from /static/
 example: /static/favicon.ico will be served by site.com/favicon.ico
 """
 MAP_STATIC_ROOT = ('/robots.txt', '/favicon.ico')
-
 
 """
 If enabled admin will leave creation of repeated slugs
@@ -104,7 +102,6 @@ FILE_ADMIN = [
     }
 ]
 
-
 """
 Never change it here, use local_settings for this.
 """
@@ -130,14 +127,12 @@ DEBUG_TB_PANELS = (
     'flask_debugtoolbar.panels.config_vars.ConfigVarsDebugPanel',
 )
 
-
 """
 By default DEBUG_TOOLBAR is disabled
 do not change it here, do it in local_settings.py
 DEBUG_TOOLBAR_ENABLED = True
 """
 DEBUG_TOOLBAR_ENABLED = False
-
 
 """
 Flask-Gravatar can take avatar urls in jinja templates
@@ -199,7 +194,6 @@ if want to use in your site home page, read babel docs.
 BABEL_LANGUAGES = ['en', 'pt-br']
 BABEL_DEFAULT_LOCALE = 'en'
 
-
 # WTForms
 CSRF_ENABLED = True
 """
@@ -207,7 +201,6 @@ It is good to use uuid here
 $ python -c "import uuid;print uuid.uuid4()"
 """
 CSRF_SESSION_KEY = "somethingimpossibletoguess"
-
 
 # configure logger in your local_settings
 LOGGER_ENABLED = False
@@ -290,9 +283,8 @@ ALIASES_MAP = {}
 SHORTENER_SETTINGS = {"name": "BitlyShortener",
                       "bitly_api_key": "R_7d84f09c68be4c749cac2a56ace2e73f",
                       "bitly_token":
-                      "9964d1f9c8c8b4215f7690449f0980c4fe1a6906",
+                          "9964d1f9c8c8b4215f7690449f0980c4fe1a6906",
                       "bitly_login": "lingobarterbitly"}
-
 
 """
 Some HTTP proxies do not support arbitrary HTTP methods or newer HTTP methods
@@ -305,7 +297,6 @@ set the X-HTTP-Method-Override header and set the value to the intended
 HTTP method (such as PATCH).
 """
 HTTP_PROXY_METHOD_OVERRIDE = False
-
 
 """
 https://opbeat.com is application monitoring tool

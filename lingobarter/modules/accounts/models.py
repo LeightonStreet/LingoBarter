@@ -2,21 +2,20 @@
 # -*- coding: utf-8 -*-
 import logging
 from random import randint
+
 from flask import url_for
-from lingobarter.core.db import db
-from lingobarter.core.models.custom_values import HasCustomValue
-from lingobarter.utils.text import abbreviate, slugify
 from flask.ext.security import UserMixin, RoleMixin
 from flask.ext.security.utils import encrypt_password
 from flask_gravatar import Gravatar
-
+from lingobarter.core.db import db
+from lingobarter.core.models.custom_values import HasCustomValue
+from lingobarter.utils.text import abbreviate, slugify
 
 logger = logging.getLogger()
 
 
 # Auth
 class Role(db.Document, HasCustomValue, RoleMixin):
-
     name = db.StringField(max_length=80, unique=True)
     description = db.StringField(max_length=255)
 

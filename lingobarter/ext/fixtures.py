@@ -1,11 +1,10 @@
 # coding: utf-8
-from lingobarter.utils.populate import Populate
-from lingobarter.core.models.config import Lingobarter
 from lingobarter.core.models.config import Config
+from lingobarter.core.models.config import Lingobarter
+from lingobarter.utils.populate import Populate
 
 
 def configure(app, db):
-
     try:
         is_installed = Lingobarter.objects.get(slug="is_installed")
     except:
@@ -20,15 +19,11 @@ def configure(app, db):
         )
         try:
             populate.create_configs()
-            populate.create_purposes()
-            populate.create_channel_types()
-            populate.create_base_channels()
             populate.role("admin")
             populate.role("author")
             try:
                 with app.app_context():
-                    user_data, user_obj = populate.create_initial_superuser()
-                    populate.create_initial_post(user_data, user_obj)
+                    populate.create_initial_superuser()
             except Exception as e:
                 app.logger.warning("Cant create initial user and post: %s" % e)
         except Exception as e:

@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import json
-from lingobarter.core.db import db
+
 from flask.ext.babelex import lazy_gettext
+from lingobarter.core.db import db
 
 
 def default_formatter(value):
@@ -11,7 +12,6 @@ def default_formatter(value):
 
 
 class CustomValue(db.EmbeddedDocument):
-
     FORMATS = (
         ('json', "json"),
         ('text', "text"),
@@ -94,5 +94,5 @@ class HasCustomValue(object):
         for name in current_names:
             if current_names.count(name) > 1:
                 raise Exception(lazy_gettext("%(name)s already exists",
-                                   name=name))
+                                             name=name))
         super(HasCustomValue, self).clean()

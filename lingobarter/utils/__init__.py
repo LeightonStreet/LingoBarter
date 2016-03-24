@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+
 logger = logging.getLogger()
 
 
@@ -49,6 +50,7 @@ def is_accessible(roles_accepted=None, user=None):
         accessible = any(user.has_role(role) for role in roles_accepted)
         return accessible
     return True
+
 
 def parse_conf_data(data):
     """

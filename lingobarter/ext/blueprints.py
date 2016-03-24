@@ -1,6 +1,7 @@
 # coding: utf-8
-import os
 import importlib
+
+import os
 from lingobarter.ext.commands_collector import CommandsCollector
 
 
@@ -33,7 +34,7 @@ def load_from_folder(app):
     module_file = app.config.get('BLUEPRINTS_MODULE_NAME', 'main')
     blueprint_module = module_file + '.py'
     for fname in dir_list:
-        if not os.path.exists(os.path.join(path, fname, 'DISABLED')) and  \
+        if not os.path.exists(os.path.join(path, fname, 'DISABLED')) and \
                 os.path.isdir(os.path.join(path, fname)) and \
                 os.path.exists(os.path.join(path, fname, blueprint_module)):
 

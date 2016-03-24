@@ -3,15 +3,16 @@
 
 import datetime
 import random
+
 from flask import current_app
 from flask.ext.babelex import lazy_gettext
 from lingobarter.core import TEXT_FORMATS
 from lingobarter.core.db import db
+from lingobarter.core.models.custom_values import HasCustomValue
 from lingobarter.modules.accounts.models import User
-from lingobarter.utils.text import slugify
 from lingobarter.utils import get_current_user_for_models
 from lingobarter.utils.settings import get_setting_value
-from lingobarter.core.models.custom_values import HasCustomValue
+from lingobarter.utils.text import slugify
 
 
 ###############################################################

@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pyshorteners.shorteners import Shortener
 from lingobarter.utils.settings import get_setting_value
+from pyshorteners.shorteners import Shortener
 
 
 class ShorterURL(object):
-
     __shortener = None
 
     @property

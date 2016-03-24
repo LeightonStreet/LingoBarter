@@ -28,6 +28,7 @@ def _exclude(self):
         _values = only_matches(self, kwargs, silent=False)
         values = [item for item in self if item not in _values]
         return FilteredList(values, getinstance(self._instance), self._name)
+
     return inner
 
 
@@ -35,6 +36,7 @@ def _filter(self):
     def inner(*args, **kwargs):
         values = only_matches(self, kwargs)
         return FilteredList(values, getinstance(self._instance), self._name)
+
     return inner
 
 
@@ -45,6 +47,7 @@ def _get(self):
         if len(values) > 1:
             raise MultipleObjectsReturned("More than one object returned")
         return values and values[0]
+
     return inner
 
 
@@ -61,6 +64,7 @@ def _delete(self):
                                 self._name)
         else:
             return values and values[0]
+
     return inner
 
 
@@ -72,6 +76,7 @@ def _create(self):
         self.append(item)
         instance.save()
         return item
+
     return inner
 
 
@@ -95,12 +100,14 @@ def _update(self):
                                 self._name)
         else:
             return values and values[0]
+
     return inner
 
 
 def _count(self):
     def inner(*args, **kwargs):
         return len(self)
+
     return inner
 
 
@@ -121,7 +128,6 @@ class FilteredList(BaseList):
 
 
 class ListField(fields.ListField):
-
     validators = []  # should be removed when flask.mongoengine updates
     filters = []  # should be removed ""
 
