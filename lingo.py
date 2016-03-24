@@ -101,9 +101,6 @@ def showconfig():
     pprint(dict(app.config.store))
 
 
-# TODO: put populate and populate_reset here
-
-
 @core_cmd.command()
 @click.option('--reloader/--no-reloader', default=True)
 @click.option('--debug/--no-debug', default=True)

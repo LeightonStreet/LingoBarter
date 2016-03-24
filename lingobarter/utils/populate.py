@@ -117,7 +117,9 @@ class Populate(object):
     def create_config(data):
         try:
             return Config.objects.get(group=data.get('group'))
-        except:
+        except Exception as e:
+            print e
+            print type(Config.objects)
             return Config.objects.create(**data)
 
     def custom_value(self, **data):

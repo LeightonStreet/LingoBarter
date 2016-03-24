@@ -27,6 +27,8 @@ def configure(app, db):
             except Exception as e:
                 app.logger.warning("Cant create initial user and post: %s" % e)
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             app.logger.error("Error loading fixtures, try again - %s" % e)
             populate.reset()
             Config.objects.delete()

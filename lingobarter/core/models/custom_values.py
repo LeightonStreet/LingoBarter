@@ -52,7 +52,7 @@ class CustomValue(db.EmbeddedDocument):
 
     def clean(self):
         try:
-            self.value()
+            self.value
         except Exception as e:
             # raise base exception because Flask-Admin can't handle the output
             # for some specific Exceptions of Mongoengine

@@ -15,7 +15,6 @@ def configure_extensions(app, admin):
     db.init_app(app)
     security.configure(app, db)
     fixtures.configure(app, db)
-    # blueprints.load_from_packages(app)
     blueprints.load_from_folder(app)
     development.configure(app, admin)
     before_request.configure(app)
