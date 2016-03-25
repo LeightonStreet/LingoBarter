@@ -46,8 +46,9 @@ class BasicTestCase(TestCase):
         from lingobarter.core.models.config import Config
         self.assertTrue(Config.get('settings', 'DEFAULT_THEME') == 'pure')
 
-    def test_app_has_admin(self):
-        self.assertTrue(self.app.extensions.get("admin"))
+    # currently, we don't have an admin yet
+    # def test_app_has_admin(self):
+    #     self.assertTrue(self.app.extensions.get("admin"))
 
     # def test_admin_requires_password(self):
     #     t = Twill(self.app)
