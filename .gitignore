@@ -62,3 +62,6 @@ target/
 
 # Local settings
 local_settings.py
+
+# mac filesystem metadata
+.DS_Store

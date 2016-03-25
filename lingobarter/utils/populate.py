@@ -3,6 +3,8 @@ import json
 import logging
 import uuid
 
+from mongoengine import DoesNotExist
+
 from lingobarter.core.models.config import Config, Lingobarter
 from lingobarter.core.models.custom_values import CustomValue
 from lingobarter.modules.accounts.models import User, Role
@@ -85,7 +87,13 @@ class Populate(object):
 
     def role(self, name):
         if name not in self.roles:
-            role, created = Role.objects.get_or_create(name=name)
+            try:
+                role = Role.objects.get(name=name)
+                created = False
+            except DoesNotExist:
+                role = Role(name=name)
+                role.save()
+                created = True
             self.roles[name] = role
             if created:
                 logger.info("Created role: %s", name)
@@ -117,9 +125,7 @@ class Populate(object):
     def create_config(data):
         try:
             return Config.objects.get(group=data.get('group'))
-        except Exception as e:
-            print e
-            print type(Config.objects)
+        except:
             return Config.objects.create(**data)
 
     def custom_value(self, **data):
