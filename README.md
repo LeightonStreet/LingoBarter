@@ -2,6 +2,7 @@ Lingo Barter
 ============
 
 [![Build Status](https://travis-ci.org/LeightonStreet/LingoBarter.svg?branch=master)](https://travis-ci.org/LeightonStreet/LingoBarter)
+[![Coverage Status](https://coveralls.io/repos/github/LeightonStreet/LingoBarter/badge.svg?branch=master)](https://coveralls.io/github/LeightonStreet/LingoBarter?branch=master)
 
 Language Exchange Platform
 
