@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
     <!-- Site Properties -->
-    <title>Login Example - Semantic</title>
+    <title>Login - Lingobarter</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css">
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
@@ -30,44 +30,6 @@
             max-width: 450px;
         }
     </style>
-    <script>
-        $(document)
-                .ready(function () {
-                    $('.ui.form')
-                            .form({
-                                fields: {
-                                    email: {
-                                        identifier: 'email',
-                                        rules: [
-                                            {
-                                                type: 'empty',
-                                                prompt: 'Please enter your e-mail'
-                                            },
-                                            {
-                                                type: 'email',
-                                                prompt: 'Please enter a valid e-mail'
-                                            }
-                                        ]
-                                    },
-                                    password: {
-                                        identifier: 'password',
-                                        rules: [
-                                            {
-                                                type: 'empty',
-                                                prompt: 'Please enter your password'
-                                            },
-                                            {
-                                                type: 'length[6]',
-                                                prompt: 'Your password must be at least 6 characters'
-                                            }
-                                        ]
-                                    }
-                                }
-                            })
-                    ;
-                })
-        ;
-    </script>
 </head>
 <body>
 
@@ -79,29 +41,48 @@
                 Log-in to your account
             </div>
         </h2>
-        <form class="ui large form">
+        <form class="ui large form" name="login_user_form" method="post" action="{{ url_for_security('login') }}">
             <div class="ui stacked segment">
+                {{ login_user_form.hidden_tag() }}
                 <div class="field">
                     <div class="ui left icon input">
                         <i class="user icon"></i>
-                        <input type="text" name="email" placeholder="E-mail address">
+                        {{ login_user_form.email(placeholder="Email address") | safe }}
                     </div>
                 </div>
                 <div class="field">
                     <div class="ui left icon input">
                         <i class="lock icon"></i>
-                        <input type="password" name="password" placeholder="Password">
+                        {{ login_user_form.password(placeholder="Password") | safe }}
                     </div>
                 </div>
-                <div class="ui fluid large teal submit button">Login</div>
+                <div class="field">
+                    <div class="ui checkbox">
+                        {{ login_user_form.remember() | safe }}
+                        <label>Remember me</label>
+                    </div>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a href="{{ url_for_security('forgot_password') }}">Forget password?</a>
+                </div>
+                {{ login_user_form.next() | safe }}
+                {{ login_user_form.submit(class="ui fluid large teal submit button", value="Login") | safe}}
             </div>
 
-            <div class="ui error message"></div>
-
+            <div class="ui error message" style="display: {% if login_user_form.email.errors or login_user_form.password.errors %} block; {% endif %}">
+                <ul class="list">
+                    {% if login_user_form.email.errors %}
+                        <li>{{ login_user_form.email.errors[0] }}</li>
+                    {% endif %}
+                    {% if login_user_form.password.errors %}
+                        <li>{{ login_user_form.password.errors[0] }}</li>
+                    {% endif %}
+                </ul>
+            </div>
         </form>
 
         <div class="ui message">
-            New to us? <a href="#">Sign Up</a>
+            New to us? <a href="{{ url_for_security('register') }}">Sign Up</a><br>
+            Didn't receive a confirmation email? <a href="{{ url_for_security('send_confirmation') }}">Request a new one</a>.
         </div>
     </div>
 </div>

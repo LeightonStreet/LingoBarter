@@ -152,12 +152,21 @@
         <a class="item">Company</a>
         <a class="item">Careers</a>
         <div class="right menu">
-            <div class="item">
-                <a class="ui button" href="{{ url_for_security('login') }}">Log in</a>
-            </div>
-            <div class="item">
-                <a class="ui primary button">Sign Up</a>
-            </div>
+            {% if current_user.is_authenticated() %}
+                <div class="item">
+                    <a class="ui primary icon button" href="{{ url_for('lingobarter.modules.accounts.profile', user_id=current_user.id) }}"><i class="icon user"></i></a>
+                </div>
+                <div class="item">
+                    <a class="ui primary button" href="{{ url_for_security('logout') }}">Log out</a>
+                </div>
+            {% else %}
+                <div class="item">
+                    <a class="ui button" href="{{ url_for_security('login') }}">Log in</a>
+                </div>
+                <div class="item">
+                    <a class="ui primary button" href="{{ url_for_security('register') }}">Sign Up</a>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -187,8 +196,21 @@
                 <a class="item">Company</a>
                 <a class="item">Careers</a>
                 <div class="right item">
-                    <a class="ui inverted button" href="{{ url_for_security('login') }}">Log in</a>
-                    <a class="ui inverted button">Sign Up</a>
+                    {% if current_user.is_authenticated() %}
+                        <div class="item">
+                            <a class="ui primary icon button" href="{{ url_for('lingobarter.modules.accounts.profile', user_id=current_user.id) }}"><i class="icon user"></i></a>
+                        </div>
+                        <div class="item">
+                            <a class="ui primary button" href="{{ url_for_security('logout') }}">Log out</a>
+                        </div>
+                    {% else %}
+                        <div class="item">
+                            <a class="ui button" href="{{ url_for_security('login') }}">Log in</a>
+                        </div>
+                        <div class="item">
+                            <a class="ui primary button" href="{{ url_for_security('register') }}">Sign Up</a>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
