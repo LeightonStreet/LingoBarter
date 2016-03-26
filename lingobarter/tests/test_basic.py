@@ -42,10 +42,6 @@ class BasicTestCase(TestCase):
             self.db.connection.HOST == self.get_config('MONGODB_HOST')
         )
 
-    def test_has_default_theme(self):
-        from lingobarter.core.models.config import Config
-        self.assertTrue(Config.get('settings', 'DEFAULT_THEME') == 'pure')
-
     # currently, we don't have an admin yet
     def test_app_has_admin(self):
         self.assertTrue(self.app.extensions.get("admin"))

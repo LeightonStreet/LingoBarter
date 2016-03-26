@@ -17,13 +17,13 @@ class Populate(object):
         self.db = db
         self.args = args
         self.kwargs = kwargs
+        self.json_data = None
         self.roles = {}
         self.users = {}
         self.custom_values = {}
         self.load_fixtures()
         self.baseurl = self.kwargs.get('baseurl')
         self.app = self.kwargs.get('app')
-        self.json_data = None
 
     def __call__(self, *args, **kwargs):
         if self.baseurl and self.app:
