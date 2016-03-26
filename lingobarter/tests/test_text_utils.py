@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import unittest
+
 from lingobarter.utils.text import slugify, abbreviate
 
 

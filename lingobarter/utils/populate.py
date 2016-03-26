@@ -3,11 +3,10 @@ import json
 import logging
 import uuid
 
-from mongoengine import DoesNotExist
-
 from lingobarter.core.models.config import Config, Lingobarter
 from lingobarter.core.models.custom_values import CustomValue
 from lingobarter.modules.accounts.models import User, Role
+from mongoengine import DoesNotExist
 
 logger = logging.getLogger()
 

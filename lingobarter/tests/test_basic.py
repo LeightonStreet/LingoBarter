@@ -1,4 +1,5 @@
 import unittest
+
 from flask.ext.testing import TestCase  # , Twill
 from lingobarter import create_app
 from lingobarter.core.admin import create_admin

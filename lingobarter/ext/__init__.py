@@ -1,8 +1,8 @@
 # coding: utf-8
 from flask_mail import Mail
+from lingobarter.core.admin import configure_admin
 from lingobarter.core.cache import cache
 from lingobarter.core.db import db
-from lingobarter.core.admin import configure_admin
 from . import (generic, babel, blueprints, error_handlers, before_request,
                views, fixtures, oauthlib, security, development)
 

@@ -2,8 +2,9 @@
 # coding: utf-8
 
 import unittest
-from lingobarter.utils.shorturl import ShorterURL
+
 from lingobarter import create_app
+from lingobarter.utils.shorturl import ShorterURL
 
 
 class TestShorterUrl(unittest.TestCase):

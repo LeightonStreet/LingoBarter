@@ -1,9 +1,8 @@
 # coding: utf-8
-from mongoengine import DoesNotExist
-
 from lingobarter.core.models.config import Config
 from lingobarter.core.models.config import Lingobarter
 from lingobarter.utils.populate import Populate
+from mongoengine import DoesNotExist
 
 
 def configure(app, db):
