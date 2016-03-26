@@ -29,21 +29,3 @@ def create_app(config=None, test=False, admin_instance=None, **settings):
 
 def create_api(config=None, **settings):
     return None
-
-
-def create_celery_app(app=None):
-    from celery import Celery
-    app = app or create_app()
-    celery = Celery(__name__, broker=app.config['CELERY_BROKER_URL'])
-    celery.conf.update(app.config)
-    taskbase = celery.Task
-
-    class ContextTask(taskbase):
-        abstract = True
-
-        def __call__(self, *args, **kwargs):
-            with app.app_context():
-                return taskbase.__call__(self, *args, **kwargs)
-
-    celery.Task = ContextTask
-    return celery

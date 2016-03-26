@@ -2,6 +2,7 @@
 from flask_mail import Mail
 from lingobarter.core.cache import cache
 from lingobarter.core.db import db
+from lingobarter.core.admin import configure_admin
 from . import (generic, babel, blueprints, error_handlers, before_request,
                views, fixtures, oauthlib, security, development)
 
@@ -16,6 +17,7 @@ def configure_extensions(app, admin):
     security.configure(app, db)
     fixtures.configure(app, db)
     blueprints.load_from_folder(app)
+    configure_admin(app, admin)
     development.configure(app, admin)
     before_request.configure(app)
     views.configure(app)
