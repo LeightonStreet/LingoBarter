@@ -8,6 +8,12 @@ from . import (generic, babel, blueprints, error_handlers, before_request,
 
 
 def configure_extensions(app, admin):
+    """
+    configure all the extensions
+    :param app:
+    :param admin:
+    :return:
+    """
     cache.init_app(app)
     babel.configure(app)
     generic.configure(app)
@@ -27,5 +33,5 @@ def configure_extensions(app, admin):
 
 def configure_extensions_min(app, *args, **kwargs):
     db.init_app(app)
-    security.init_app(app, db)
+    security.configure(app, db)
     return app

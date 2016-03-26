@@ -15,6 +15,8 @@ export LINGOBARTER_MONGODB_HOST='localhost'
 export LINGOBARTER_MONGODB_PORT='$int 27017'
 
 Or just fill your values in this file and rename it to 'local_settings.py'
+We recommend you to use local_settings.py to locally configure your lingobarter,
+local_settings.py has been already added to .gitignore list.
 """
 
 # MONGO

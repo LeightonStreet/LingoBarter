@@ -3,7 +3,7 @@
 wsgi.py
 =======
 This file is used by openshift, please use lingo.py
-to start lingobarter.
+to start lingobarter. This file should be left untouched.
 """
 
 import argparse
@@ -13,6 +13,7 @@ from lingobarter.utils.paas import activate
 from werkzeug.serving import run_simple
 from werkzeug.wsgi import DispatcherMiddleware
 
+# in the future, we will write the api routing
 application = DispatcherMiddleware(create_app(), {
     '/api': create_api()
 })

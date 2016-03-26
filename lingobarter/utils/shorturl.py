@@ -5,6 +5,7 @@ from lingobarter.utils.settings import get_setting_value
 from pyshorteners.shorteners import Shortener
 
 
+# for shorter url routing
 class ShorterURL(object):
     __shortener = None
 

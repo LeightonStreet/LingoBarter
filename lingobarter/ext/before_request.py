@@ -1,7 +1,5 @@
 # coding: utf-8
 
-# from lingobarter.core.models import Channel, Config, CustomValue
-
 
 def configure(app):
     @app.before_first_request

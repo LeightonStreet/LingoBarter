@@ -15,6 +15,7 @@ def create_admin(app=None):
 
 
 def configure_admin(app, admin):
+    # routing admin
     admin_config = app.config.get(
         'ADMIN',
         {

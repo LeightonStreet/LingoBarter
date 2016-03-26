@@ -3,6 +3,7 @@
 
 """
 This functions created by Alvaro Justen (Turicas)
+Helper function dealing with text
 """
 from slugify import slugify as awesome_slugify
 

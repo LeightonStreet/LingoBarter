@@ -9,6 +9,12 @@ from werkzeug.utils import secure_filename
 
 
 def dated_path(obj, file_data):
+    """
+    generate cache path for uploaded media file
+    :param obj:
+    :param file_data:
+    :return:
+    """
     try:
         prefix = getattr(obj, 'model_name')
     except:

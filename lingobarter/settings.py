@@ -71,38 +71,6 @@ Default configuration for FLask-Admin instance
 ADMIN = {'name': 'Lingobarter admin', 'url': '/admin'}
 
 """
-File admin can expose folders, you just need to have them
-mapped in your server or in flask, see lingobarter.ext.views
-"""
-
-DEFAULT_EDITABLE_EXTENSIONS = (
-    'html', 'css', 'js', 'py', 'txt', 'md', 'cfg', 'coffee', 'html', 'json',
-    'xml', 'yaml', 'yml', 'HTML', 'CSS', 'JS', 'PY', 'TXT', 'MD', 'CFG',
-    'COFFEE', 'HTML', 'JSON', 'XML', 'YAML', 'YML'
-)
-
-FILE_ADMIN = [
-    {
-        "name": "Static files",
-        "category": "Files",
-        "path": STATIC_ROOT,
-        "url": "/static/",  # create nginx rule
-        "endpoint": "static_files",
-        "roles_accepted": ("admin", "editor"),
-        "editable_extensions": DEFAULT_EDITABLE_EXTENSIONS
-    },
-    {
-        "name": "Media files",
-        "category": "Files",
-        "path": MEDIA_ROOT,
-        "url": "/mediafiles/",  # Create nginx rule
-        "endpoint": "media_files",
-        "roles_accepted": ("admin", "editor"),
-        "editable_extensions": DEFAULT_EDITABLE_EXTENSIONS
-    }
-]
-
-"""
 Never change it here, use local_settings for this.
 """
 MODE = 'production'
@@ -208,45 +176,6 @@ LOGGER_LEVEL = 'DEBUG'
 LOGGER_FORMAT = '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
 LOGGER_DATE_FORMAT = '%d.%m %H:%M:%S'
 
-# media module
-MEDIA_IMAGE_ALLOWED_EXTENSIONS = ('jpg', 'jpeg', 'png', 'tiff', 'gif', 'bmp')
-MEDIA_AUDIO_ALLOWED_EXTENSIONS = ('mp3', 'wmv', 'ogg')
-MEDIA_VIDEO_ALLOWED_EXTENSIONS = ('avi', 'mp4', 'mpeg')
-MEDIA_FILE_ALLOWED_EXTENSIONS = ('pdf', 'txt', 'doc', 'docx', 'xls', 'xmlsx')
-
-"""
-Lingobarter-Themes checks `THEME_PATHS` configuration variable to find
-directories that contain themes. The theme's identifier in info.json
-must match the name of its directory.
-"""
-# THEME_PATHS = '/etc/themes/'
-
-# default admin THEME
-ADMIN_THEME = 'admin'
-"""
-https://bootswatch.com/2/ themes available:
-amelia cerulean cosmo cyborg default flatly
-journal readable simplex slate spacelab
-spruce superhero united
-"""
-ADMIN_SWATCH = 'default'
-
-ADMIN_ICONS = [
-    ('post.create_view', 'pencil', 'Write'),
-    ('post.index_view', 'th-list', 'Posts'),
-    ('config.index_view', 'cog', 'Config'),
-    ('user.index_view', 'user', 'Users'),
-    ('image.index_view', 'picture', 'Images'),
-    ('image.create_view', 'arrow-up', 'Upload'),
-    ('channel.index_view', 'th-list', 'Channels')
-]
-
-# front end theme
-DEFAULT_THEME = 'pure'
-
-# default content extension for url buildind
-CONTENT_EXTENSION = "html"
-
 SENTRY_ENABLED = False
 SENTRY_DSN = ""
 
@@ -258,26 +187,6 @@ SHORTENER_ENABLED = False
 
 "Note: if you enable shortener you have to define a SERVER_NAME"
 # SERVER_NAME = 'localhost'
-
-"Redirect aliases is enabled?"
-ALIASES_ENABLED = True
-
-"""
-ALIASES_MAP
-keys are long_slug
-    keys should always start with /
-    & end with / or extension.
-{
-    "/team/": {
-        "alias_type": "endpoint|long_slug|url|string",
-        "to": "authors|/articles/science.html|http://t.co|'<b>Hello</b>'",
-        "published": True,
-        "available_at": "",
-        "available_until: "",
-    }
-}
-"""
-ALIASES_MAP = {}
 
 "Config shorter information"
 SHORTENER_SETTINGS = {"name": "BitlyShortener",

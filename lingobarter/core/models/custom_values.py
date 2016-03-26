@@ -52,6 +52,8 @@ class CustomValue(db.EmbeddedDocument):
 
     def clean(self):
         try:
+            # see property annotation above, value will be an unicode string,
+            # instead of a function
             self.value
         except Exception as e:
             # raise base exception because Flask-Admin can't handle the output

@@ -16,6 +16,7 @@ def create_app_min(config=None, test=False):
 
 def get_site_url():
     try:
+        # why import models module instead of config.py? to avoid circular import
         from_site_config = m.config.Config.get('site', 'site_domain', None)
         from_settings = get_setting_value('SERVER_NAME', None)
         if from_settings and not from_settings.startswith('http'):
@@ -43,5 +44,6 @@ def get_setting_value(key, default=None):
 def get_password(f):
     try:
         return open('.%s_password.txt' % f).read().strip()
-    except:
+    except Exception as e:
+        logger.warning('password file does not exist: %s' % e)
         return

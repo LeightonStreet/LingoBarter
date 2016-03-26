@@ -4,7 +4,8 @@ from werkzeug.urls import url_decode
 
 
 class HTTPMethodOverrideMiddleware(object):
-    """The HTTPMethodOverrideMiddleware middleware implements the hidden HTTP
+    """
+    The HTTPMethodOverrideMiddleware middleware implements the hidden HTTP
     method technique. Not all web browsers support every HTTP method, such as
     DELETE and PUT. This middleware class allows clients to provide a method
     override parameter via an HTTP header value or a querystring parameter.

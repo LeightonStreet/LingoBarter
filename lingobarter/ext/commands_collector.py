@@ -6,7 +6,8 @@ import os
 
 
 class CommandsCollector(click.MultiCommand):
-    """A MultiCommand to collect all click commands from a given
+    """
+    A MultiCommand to collect all click commands from a given
     modules path and base name for the module.
     The commands functions needs to be in a module inside commands
     folder and the name of the file will be used as the command name.

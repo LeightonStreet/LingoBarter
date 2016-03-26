@@ -1,4 +1,4 @@
-.PHONY: run shell test install clean
+.PHONY: run shell test clean
 
 run:
 	python lingo.py runserver --reloader --debug
@@ -8,9 +8,6 @@ shell:
 
 test:
 	LINGOBARTER_MODE=test py.test --cov=lingobarter -l --tb=long --maxfail=1 lingobarter/
-
-install:
-	python setup.py develop
 
 clean:
 	@find ./ -name '*.pyc' -exec rm -f {} \;

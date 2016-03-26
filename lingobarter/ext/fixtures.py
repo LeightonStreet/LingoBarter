@@ -1,4 +1,6 @@
 # coding: utf-8
+from mongoengine import DoesNotExist
+
 from lingobarter.core.models.config import Config
 from lingobarter.core.models.config import Lingobarter
 from lingobarter.utils.populate import Populate
@@ -7,7 +9,7 @@ from lingobarter.utils.populate import Populate
 def configure(app, db):
     try:
         is_installed = Lingobarter.objects.get(slug="is_installed")
-    except:
+    except DoesNotExist:
         is_installed = False
 
     if not is_installed:
@@ -27,8 +29,6 @@ def configure(app, db):
             except Exception as e:
                 app.logger.warning("Cant create initial user and post: %s" % e)
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             app.logger.error("Error loading fixtures, try again - %s" % e)
             populate.reset()
             Config.objects.delete()

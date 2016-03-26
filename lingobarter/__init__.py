@@ -8,7 +8,15 @@ from lingobarter.ext import configure_extensions
 admin = create_admin()
 
 
-def create_app_base(config=None, test=False, admin_instance=None, **settings):
+def create_app_base(config=None, test=False, **settings):
+    """
+    create basic app. no extension added to app object
+    in this function.
+    :param config:
+    :param test:
+    :param settings:
+    :return:
+    """
     app = LingobarterApp('lingobarter')
     app.config.load_lingobarter_config(config=config, test=test, **settings)
     if test or app.config.get('TESTING'):
@@ -17,15 +25,32 @@ def create_app_base(config=None, test=False, admin_instance=None, **settings):
 
 
 def create_app(config=None, test=False, admin_instance=None, **settings):
+    """
+    use create_app_base, and configure extensions here.
+    admin is added in this function. The routing policy
+    is `/admin`.
+    :param config:
+    :param test:
+    :param admin_instance:
+    :param settings:
+    :return:
+    """
     app = create_app_base(
-        config=config, test=test, admin_instance=admin_instance, **settings
+        config=config, test=test, **settings
     )
-
+    # configure all the extensions
     configure_extensions(app, admin_instance or admin)
+    # http method override, by query params or headers
     if app.config.get("HTTP_PROXY_METHOD_OVERRIDE"):
         app.wsgi_app = HTTPMethodOverrideMiddleware(app.wsgi_app)
     return app
 
 
 def create_api(config=None, **settings):
+    """
+    In future...
+    :param config:
+    :param settings:
+    :return:
+    """
     return None

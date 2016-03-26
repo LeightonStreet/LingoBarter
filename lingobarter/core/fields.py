@@ -1,5 +1,10 @@
 # coding: utf-8
-
+"""
+fields.py
+=========
+Helper functions for mongodb query,
+see db.py, added all these function under db object
+"""
 from mongoengine import fields
 from mongoengine.base.datastructures import BaseList
 

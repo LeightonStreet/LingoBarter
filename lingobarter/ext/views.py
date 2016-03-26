@@ -30,7 +30,7 @@ def configure(app):
     for filepath in app.config.get('MAP_STATIC_ROOT', []):
         app.add_lingobarter_url_rule(filepath, view_func=static_from_root)
 
-    # Home page
+    # Home page, pending more global views registration
     app.add_lingobarter_url_rule(
         '/',
         view_func=ContentList.as_view('home')

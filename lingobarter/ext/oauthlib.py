@@ -9,7 +9,7 @@ from lingobarter.modules.accounts.oauth import make_oauth_handler, oauth_login
 def configure(app):
     """
     will build oauthlib remote apps from config vairable in form of
-
+    currently, no oauth needed
     OAUTH = {
         "google": {
             "consumer_key": 'xxxxxxxxxxxx',

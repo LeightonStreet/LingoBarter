@@ -5,7 +5,11 @@ from flask_wtf.csrf import CsrfProtect
 
 
 def configure(app):
-    # Markdown(app)
+    """
+    configure mistune, csrf, and gravatar
+    :param app:
+    :return:
+    """
     Mistune(app)
     CsrfProtect(app)
     if app.config.get('GRAVATAR'):

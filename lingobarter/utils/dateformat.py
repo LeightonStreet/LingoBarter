@@ -1,11 +1,12 @@
 # coding: utf: 8
 
 
-def pretty_date(time=False):  # noqa
+def pretty_date(time=None):  # noqa
     """
     Get a datetime object or a int() Epoch timestamp and return a
     pretty string like 'an hour ago', 'Yesterday', '3 months ago',
     'just now', etc
+    :param time:
     """
     from datetime import datetime
     now = datetime.now()
@@ -13,7 +14,8 @@ def pretty_date(time=False):  # noqa
         diff = now - datetime.fromtimestamp(time)
     elif isinstance(time, datetime):
         diff = now - time
-    elif not time:
+    else:
+        # assume None
         diff = now - now
     second_diff = diff.seconds
     day_diff = diff.days

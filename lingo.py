@@ -108,6 +108,8 @@ def showconfig():
 @click.option('--port', default=5000)
 def runserver(reloader, debug, host, port):
     """Run the Flask development server i.e. app.run()
+    normally, we will use command line, ./lingo.py runserver to start
+    lingobarter.
     :param reloader:
     :param debug:
     :param host:

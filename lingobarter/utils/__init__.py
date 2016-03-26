@@ -29,7 +29,7 @@ def get_current_user():
 def get_current_user_for_models():
     """
     Hackish but needed for running tests outside application context
-    Because Flask test context is not well configured yet
+    Because Flask test context is not well configured yet.
     :return: User or None
     """
     user = get_current_user()

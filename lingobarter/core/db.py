@@ -4,5 +4,6 @@
 from flask.ext.mongoengine import MongoEngine
 from .fields import ListField
 
+# db connection
 db = MongoEngine()
 db.ListField = ListField

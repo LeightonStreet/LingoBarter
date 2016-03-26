@@ -3,6 +3,11 @@ from flask import render_template
 
 
 def configure(app):
+    """
+    all the error routing logic locates here
+    :param app:
+    :return:
+    """
     @app.errorhandler(403)
     def forbidden_page(*args, **kwargs):
         """
@@ -48,12 +53,3 @@ def configure(app):
     @app.errorhandler(500)
     def server_error_page(*args, **kwargs):
         return render_template("errors/server_error.html"), 500
-
-    # URLBUILD Error Handlers
-    def admin_icons_error_handler(error, endpoint, *args, **kwargs):
-        """when some of default dashboard button is deactivated, avoids error"""
-        if endpoint in [item[0] for item in app.config.get('ADMIN_ICONS', [])]:
-            return '/admin'
-        raise error
-
-    app.url_build_error_handlers.append(admin_icons_error_handler)

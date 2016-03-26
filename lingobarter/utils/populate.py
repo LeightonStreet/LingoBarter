@@ -19,13 +19,11 @@ class Populate(object):
         self.kwargs = kwargs
         self.roles = {}
         self.users = {}
-        self.channels = {}
-        self.channel_types = {}
-        self.purposes = {}
         self.custom_values = {}
         self.load_fixtures()
         self.baseurl = self.kwargs.get('baseurl')
         self.app = self.kwargs.get('app')
+        self.json_data = None
 
     def __call__(self, *args, **kwargs):
         if self.baseurl and self.app:
@@ -39,37 +37,38 @@ class Populate(object):
         self.create_users()
         self.create_configs()
 
-    def generate_random_password(self):
+    @staticmethod
+    def generate_random_password():
         return uuid.uuid4().hex
 
     def create_initial_superuser(self):
         password = self.generate_random_password()
         user_data = {
-            "name": "Quokka Admin",
-            "email": "admin@quokkaproject.org",
-            "gravatar_email": "rochacbruno+quokka@gmail.com",
+            "name": "Lingobarter Admin",
+            "email": "admin@lingobarter.com",
+            "gravatar_email": "jet.in.brain@gmail.com",
             "password": password[:6],
             "roles": ["admin"],
-            "bio": "Quokka Example Admin",
-            "tagline": "Quokka is the best CMS!",
+            "bio": "Lingobarter Example Admin",
+            "tagline": "Lingobarter is the best language exchange platform!",
             "links": [
                 {
                     "title": "facebook",
-                    "link": "http://facebook.com/quokkaproject",
+                    "link": "http://facebook.com/lingobarter",
                     "icon": "facebook",
                     "css_class": "facebook",
                     "order": 0
                 },
                 {
                     "title": "github",
-                    "link": "http://github.com/quokkaproject",
+                    "link": "http://github.com/lingobarter",
                     "icon": "github",
                     "css_class": "github",
                     "order": 0
                 },
                 {
                     "title": "twitter",
-                    "link": "http://twitter.com/quokkaproject",
+                    "link": "http://twitter.com/lingobarter",
                     "icon": "twitter",
                     "css_class": "twitter",
                     "order": 0
@@ -91,7 +90,9 @@ class Populate(object):
                 role = Role.objects.get(name=name)
                 created = False
             except DoesNotExist:
-                role = Role(name=name)
+                # noinspection PyArgumentList
+                role = Role(name=name,
+                            description='role created by population')
                 role.save()
                 created = True
             self.roles[name] = role
@@ -117,15 +118,15 @@ class Populate(object):
             logger.info("Exist: User: mail: %s", data.get('email'))
 
     def create_users(self, data=None):
-        self.users_data = data or self.json_data.get('users')
-        for data in self.users_data:
+        users_data = data or self.json_data.get('users')
+        for data in users_data:
             self.create_user(data)
 
     @staticmethod
     def create_config(data):
         try:
             return Config.objects.get(group=data.get('group'))
-        except:
+        except DoesNotExist:
             return Config.objects.create(**data)
 
     def custom_value(self, **data):
@@ -137,9 +138,9 @@ class Populate(object):
         return value
 
     def create_configs(self):
-        self.configs_data = self.json_data.get('configs')
+        configs_data = self.json_data.get('configs')
 
-        for config in self.configs_data:
+        for config in configs_data:
             config['values'] = [self.custom_value(**args)
                                 for args in config.get('values')]
             self.create_config(config)

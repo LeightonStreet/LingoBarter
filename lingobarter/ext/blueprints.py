@@ -46,13 +46,14 @@ def load_from_folder(app):
             app.logger.info("registering blueprint: %s" % blueprint.name)
             app.register_blueprint(blueprint)
 
+            # TODO: admin pending!!!
             # register admin
-            try:
-                importlib.import_module(".".join([module_root, 'admin']))
-            except ImportError as e:
-                app.logger.info(
-                    "%s module does not define admin or error: %s", fname, e
-                )
+            # try:
+            #     importlib.import_module(".".join([module_root, 'admin']))
+            # except ImportError as e:
+            #     app.logger.info(
+            #         "%s module does not define admin or error: %s", fname, e
+            #     )
 
     app.logger.info("%s modules loaded", mods.keys())
 
