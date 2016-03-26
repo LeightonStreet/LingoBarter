@@ -3,11 +3,11 @@
         {
             "name" : "admin",
             "email" : "admin@example.com",
-            "gravatar_email": "rochacbruno+quokka@gmail.com",
+            "gravatar_email": "jet.in.brain@gmail.com",
             "password" : "admin",
             "roles" : [ "admin" ],
-            "bio": "Quokka Example Admin",
-            "tagline": "Quokka is the best CMS!",
+            "bio": "Lingobarter Example Admin",
+            "tagline": "Lingobarter is the best CMS!",
             "links": [
                 {
                     "title" : "facebook",
@@ -35,11 +35,11 @@
         {
             "name" : "author",
             "email" : "author@example.com",
-            "gravatar_email": "rochacbruno+quokka@gmail.com",
+            "gravatar_email": "jet.in.brain@gmail.com",
             "password" : "author",
             "roles" : [ "author" ],
-            "bio": "Quokka Example Author",
-            "tagline": "It is nice to write in Quokka CMS!",
+            "bio": "Lingobarter Example Author",
+            "tagline": "It is nice to write in Lingobarter CMS!",
             "links": [
                 {
                     "title" : "facebook",
@@ -72,12 +72,12 @@
             "values": [
                {
                    "name": "site_name",
-                   "rawvalue": "Quokka website",
+                   "rawvalue": "Lingobarter website",
                    "formatter": "text"
                },
                {
                    "name": "site_keywords",
-                   "rawvalue": "cms,quokka,flask,mongo,python",
+                   "rawvalue": "cms,lingobarter,flask,mongo,python",
                    "formatter": "text"
                },
                {
@@ -107,12 +107,12 @@
                },
                {
                    "name": "menu_items",
-                   "rawvalue":"[[\"Quokka CMS\", \"http://www.quokkaproject.org\"], [\"Slack Chat\", \"https://quokkaslack.herokuapp.com/\"]]",
+                   "rawvalue":"[[\"Lingobarter\", \"http://www.lingobarter.org\"], [\"Slack Chat\", \"https://quokkaslack.herokuapp.com/\"]]",
                    "formatter": "json"
                },
                {
                    "name": "social_items",
-                   "rawvalue":"[[\"github\", \"http://github.com/quokkaproject\"], [\"twitter\", \"https://twitter.com/quokkaproject/\"]]",
+                   "rawvalue":"[[\"github\", \"http://github.com/lingobarter\"], [\"twitter\", \"https://twitter.com/lingobarter/\"]]",
                    "formatter": "json"
                }
             ]
