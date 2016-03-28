@@ -3,6 +3,9 @@ Lingo Barter
 
 [![Build Status](https://travis-ci.org/LeightonStreet/LingoBarter.svg?branch=master)](https://travis-ci.org/LeightonStreet/LingoBarter)
 [![Coverage Status](https://coveralls.io/repos/github/LeightonStreet/LingoBarter/badge.svg?branch=master)](https://coveralls.io/github/LeightonStreet/LingoBarter?branch=master)
+[![Code Health](https://landscape.io/github/LeightonStreet/LingoBarter/master/landscape.svg?style=flat)](https://landscape.io/github/LeightonStreet/LingoBarter/master)
+[![Stories in Ready](https://badge.waffle.io/LeightonStreet/LingoBarter.png?label=ready&title=Ready)](https://waffle.io/LeightonStreet/LingoBarter)
+
 
 Language Exchange Platform
 
