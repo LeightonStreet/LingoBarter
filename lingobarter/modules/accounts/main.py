@@ -6,7 +6,7 @@ from .resouces import TodoItem
 
 # create our module based on blueprint
 module = LingobarterModule('accounts', __name__, template_folder='templates')
-# create our api service based on this module
+# create our api service based on this module, default prefix will be /api/v1/
 api_v1 = LingobarterApi(module, version='v1')
 
 # add normal url routing

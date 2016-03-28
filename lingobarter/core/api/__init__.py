@@ -28,7 +28,7 @@ class LingobarterApi(Api):
         :param version:
         :return:
         """
-        self.name = app.name + '.api.' + str(version)
+        self.name = 'api.' + str(version)
         super(LingobarterApi, self).__init__(app=app, prefix='/api/' + str(version))
 
     def add_lingobarter_resource(self, resource, *urls, **kwargs):
