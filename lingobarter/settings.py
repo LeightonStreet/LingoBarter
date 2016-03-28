@@ -234,3 +234,11 @@ $   curl https://intake.opbeat.com/api/v1/
     -d status=completed
 """
 # OPBEAT = None
+
+"""
+ALIASES_MAP
+keys are long_slug
+    keys should always start with /
+    & end with / or extension.
+"""
+ALIASES_MAP = {}

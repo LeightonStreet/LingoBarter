@@ -2,6 +2,7 @@ from flask import Flask, Blueprint
 # noinspection PyProtectedMember
 from flask.helpers import _endpoint_from_view_func
 from lingobarter.core.config import LingobarterConfig
+from lingobarter.utils.aliases import dispatch_aliases
 
 
 class LingobarterApp(Flask):
@@ -23,7 +24,7 @@ class LingobarterApp(Flask):
         return self.config_class(root_path, self.default_config)
 
     def preprocess_request(self):
-        return super(LingobarterApp, self).preprocess_request()
+        return dispatch_aliases() or super(LingobarterApp, self).preprocess_request()
 
     def add_lingobarter_url_rule(self, rule, endpoint=None, view_func=None, **options):
         if endpoint is None:

@@ -1,9 +1,19 @@
 # coding: utf8
 from lingobarter.core.app import LingobarterModule
+from lingobarter.core.api import LingobarterApi
 from .views import ProfileEditView, ProfileView
+from .resouces import TodoItem
 
+# create our module based on blueprint
 module = LingobarterModule('accounts', __name__, template_folder='templates')
+# create our api service based on this module
+api_v1 = LingobarterApi(module, version='v1')
+
+# add normal url routing
 module.add_url_rule('/accounts/profile/<user_id>/',
                     view_func=ProfileView.as_view('profile'))
 module.add_url_rule('/accounts/profile/edit/',
                     view_func=ProfileEditView.as_view('profile_edit'))
+
+# add restful webservice endpoints
+api_v1.add_lingobarter_resource(TodoItem, '/accounts/<int:todo_id>')
