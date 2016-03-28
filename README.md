@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/LeightonStreet/LingoBarter.png?label=ready&title=Ready)](https://waffle.io/LeightonStreet/LingoBarter)
 Lingo Barter
 ============
 
