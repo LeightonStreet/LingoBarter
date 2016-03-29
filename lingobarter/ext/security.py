@@ -32,3 +32,15 @@ def configure(app, db):
         register_form=register_form,
         confirm_register_form=confirm_register_form
     )
+    config = app.config.get('CELERY_ENABLED')
+    if config is not None and config:
+        # Setup the task
+        @app.celery.task
+        def send_security_email(msg):
+            # Use the Flask-Mail extension instance to send the incoming ``msg`` parameter
+            # which is an instance of `flask_mail.Message`
+            app.mail.send(msg)
+
+        @app.security.send_mail_task
+        def delay_security_email(msg):
+            send_security_email.delay(msg)

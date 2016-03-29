@@ -9,6 +9,8 @@ from lingobarter.ext.blueprints import blueprint_commands
 
 # create lingobarter application
 app = create_app()
+# expose celery for celery worker
+celery = app.celery
 
 # configure logging format
 if app.config.get("LOGGER_ENABLED"):

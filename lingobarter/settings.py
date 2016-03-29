@@ -242,3 +242,23 @@ keys are long_slug
     & end with / or extension.
 """
 ALIASES_MAP = {}
+
+
+"""
+Redis related configuration
+- Redis session
+- Redis cache
+- Celery tasks
+"""
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
+# session using redis
+REDIS_SESSION = False
+REDIS_SESSION_DB = 0
+
+"""
+CELERY configuration
+"""
+# Celery default using redis, we may move to rabbitMQ in future
+CELERY_ENABLED = False
+CELERY_BROKER_URL = 'redis://localhost:6379/1'
