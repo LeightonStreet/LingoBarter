@@ -8,15 +8,13 @@ to start lingobarter. This file should be left untouched.
 
 import argparse
 
-from lingobarter import create_app, create_api
+from lingobarter import create_app
 from lingobarter.utils.paas import activate
 from werkzeug.serving import run_simple
 from werkzeug.wsgi import DispatcherMiddleware
 
 # in the future, we will write the api routing
-application = DispatcherMiddleware(create_app(), {
-    '/api': create_api()
-})
+application = DispatcherMiddleware(create_app())
 
 application = app = activate(application)
 

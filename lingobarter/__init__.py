@@ -44,13 +44,3 @@ def create_app(config=None, test=False, admin_instance=None, **settings):
     if app.config.get("HTTP_PROXY_METHOD_OVERRIDE"):
         app.wsgi_app = HTTPMethodOverrideMiddleware(app.wsgi_app)
     return app
-
-
-def create_api(config=None, **settings):
-    """
-    In future...
-    :param config:
-    :param settings:
-    :return:
-    """
-    return None
