@@ -25,3 +25,5 @@ MAP_STATIC_ROOT = (
     '/robots.txt',
     '/favicon.ico'
 )
+
+MAIL_SUPPRESS_SEND = False

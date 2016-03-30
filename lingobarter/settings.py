@@ -128,6 +128,7 @@ MAIL_USERNAME = 'rochacbruno@gmail.com'
 MAIL_PASSWORD = get_password('email')
 DEFAULT_MAIL_SENDER = None
 """
+MAIL_SUPPRESS_SEND = True
 
 """
 Take a look at Flask-Security docs

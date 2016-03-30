@@ -3,8 +3,7 @@ from celery import Celery
 
 
 def create_celery_app(app):
-    config = app.config.get('CELERY_ENABLED')
-    if config is not None and config:
+    if app.config.get('CELERY_ENABLED'):
         app.celery = Celery(__name__, broker=app.config['CELERY_BROKER_URL'])
         app.celery.conf.update(app.config)
         taskbase = app.celery.Task

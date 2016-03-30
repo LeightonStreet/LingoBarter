@@ -65,8 +65,7 @@ class RedisSessionInterface(SessionInterface):
 
 
 def configure(app):
-    config = app.config.get('REDIS_SESSION')
-    if config is not None and config:
+    if app.config.get('REDIS_SESSION'):
         db = app.config.get('REDIS_SESSION_DB') or 0
         host = app.config.get('REDIS_HOST') or 'localhost'
         port = app.config.get('REDIS_PORT') or 6379

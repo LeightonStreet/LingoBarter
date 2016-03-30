@@ -35,3 +35,16 @@ LOGGER_ENABLED = True
 LOGGER_LEVEL = 'DEBUG'
 LOGGER_FORMAT = '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
 LOGGER_DATE_FORMAT = '%d.%m %H:%M:%S'
+
+"""
+Emails won't be sent until you configure this
+http://pythonhosted.org/Flask-Mail/
+"""
+MAIL_SUPPRESS_SEND = False
+MAIL_SERVER = 'smtp.gmail.com'
+MAIL_PORT = 465
+MAIL_USE_SSL = True
+# MAIL_USE_TLS = True
+MAIL_USERNAME = '<email address>'
+MAIL_PASSWORD = '<password>'
+DEFAULT_MAIL_SENDER = None

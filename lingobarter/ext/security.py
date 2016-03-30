@@ -32,8 +32,7 @@ def configure(app, db):
         register_form=register_form,
         confirm_register_form=confirm_register_form
     )
-    config = app.config.get('CELERY_ENABLED')
-    if config is not None and config:
+    if app.config.get('CELERY_ENABLED'):
         # Setup the task
         @app.celery.task
         def send_security_email(msg):
