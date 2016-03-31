@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Send Confirmation - Lingobarter{% endblock %}
+{% block head_css %}
+    <style type="text/css">
+        body {
+            background-color: #DADADA;
+        }
+
+        body > .grid {
+            height: 100%;
+        }
+
+        .image {
+            margin-top: -100px;
+        }
+
+        .column {
+            max-width: 450px;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="ui middle aligned center aligned grid">
+        <div class="column">
+            <h2 class="ui teal image header">
+                <img src="http://semantic-ui.com/examples/assets/images/logo.png" class="image">
+                <div class="content">
+                    Resend confirmation instructions
+                </div>
+            </h2>
+            {% include "security/_messages.html" %}
+            <form class="ui large form" name="send_confirmation_form" method="post"
+                  action="{{ url_for_security('send_confirmation') }}">
+                <div class="ui stacked segment">
+                    {{ send_confirmation_form.hidden_tag() }}
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="mail icon"></i>
+                            {{ send_confirmation_form.email(placeholder="Email Address") | safe }}
+                        </div>
+                    </div>
+                    {{ send_confirmation_form.submit(class="ui fluid large teal submit button", value="Resend Confirmation") | safe }}
+                </div>
+                
+                <div class="ui error message"
+                     style="display: {% if send_confirmation_form.email.errors %} block; {% endif %}">
+                    <ul class="list">
+                        {% if send_confirmation_form.email.errors %}
+                            <li>Password: {{ send_confirmation_form.email.errors[0] }}</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </form>
+
+            <div class="ui message">
+                New to us? <a href="{{ url_for_security('register') }}">Sign Up</a><br>
+                Already have an account? <a href="{{ url_for_security('login') }}">Log in</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

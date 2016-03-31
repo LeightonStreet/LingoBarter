@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base href="{{ request.url_root }}">
+    <!-- Standard Meta -->
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <!-- SEO Meta -->
+    {% block seo_meta %}
+        <meta name="description" content="{{ Config.get('site', 'site_description') }}">
+        <meta name="keywords" content="{{ Config.get('site', 'site_keywords') }}">
+    {% endblock %}
+    <!-- Add other Meta Here -->
+    {% block meta %}{% endblock %}
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <!-- title -->
+    <title>{% block title %}{{ Config.get('site', 'site_name', 'Language Exchange Platform') }}{% endblock %}</title>
+    <!-- custom head -->
+    {% block head %}
+    {% endblock head %}
+    <!-- css and js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.js"></script>
+    {% block head_css %}{% endblock %}
+    {% block head_js %}{% endblock %}
+</head>
+<body>
+{% block content %}
+{% endblock %}
+{% block bottom_js %}
+    <script>
+        $('.message .close').on('click', function () {
+            $(this).closest('.message')
+                    .transition('fade');
+        });
+    </script>
+{% endblock %}
+{% block js_footer %}{% endblock %}
+</body>
+
+</html>

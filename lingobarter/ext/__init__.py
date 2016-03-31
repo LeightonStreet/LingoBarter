@@ -3,7 +3,7 @@ from lingobarter.core.admin import configure_admin
 from lingobarter.core.cache import cache
 from lingobarter.core.db import db
 from . import (generic, babel, blueprints, error_handlers, before_request, mail, celery_app,
-               views, fixtures, oauthlib, security, development, redis_session)
+               context_processors, views, fixtures, oauthlib, security, development, redis_session)
 
 
 def configure_extensions(app, admin):
@@ -20,6 +20,7 @@ def configure_extensions(app, admin):
     mail.configure(app)
     error_handlers.configure(app)
     db.init_app(app)
+    context_processors.configure(app)
     celery_app.create_celery_app(app)
     security.configure(app, db)
     fixtures.configure(app, db)
