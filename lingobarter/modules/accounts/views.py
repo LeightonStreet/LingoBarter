@@ -3,7 +3,7 @@
 import os
 from flask import redirect, request, url_for, flash, current_app, render_template
 from flask.ext.mongoengine.wtf import model_form
-from flask.ext.security import current_user
+from flask.ext.security import current_user, login_required
 from flask.ext.security.utils import url_for_security
 from flask.views import MethodView
 from lingobarter.utils import get_current_user
@@ -16,7 +16,7 @@ class ProfileView(MethodView):
     """
     Show User Profile
     """
-
+    @login_required
     def get(self, user_id):
         return render_template('accounts/profile.html')
 
