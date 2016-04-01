@@ -2,7 +2,9 @@ language: python
 sudo: required
 python:
   - "2.7"
-services: mongodb
+services:
+  - redis-server
+  - mongodb
 install:
   - "pip install --upgrade -r requirements/requirements.txt"
   - "pip install --upgrade -r requirements/testing.txt"
@@ -10,3 +12,7 @@ install:
 script: make test
 after_success:
   - coveralls
+notifications:
+  email:
+    recipients:
+      - lingo4barter@gmail.com
