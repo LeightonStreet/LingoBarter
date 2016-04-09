@@ -12,7 +12,7 @@ User Collection
 | name                 | type                          | default               | max length | min length | required | unique | regex | description                                          |
 |----------------------|-------------------------------|-----------------------|------------|------------|----------|--------|-------|------------------------------------------------------|
 | name                 | string                        |                       | 255        |            |          |        |       | display name of user                                 |
-| email                | email                         |                       | 255        |            |          | true   |       | user email                                           |
+| email                | email                         |                       | 255        |            | true     | true   |       | user email                                           |
 | password             | string                        |                       | 255        |            |          |        |       | user password                                        |
 | active               | boolean                       | true                  |            |            |          |        |       | user active or not                                   |
 | confirm_at           | datetime                      |                       |            |            |          |        |       | time of user email confirmation                      |
@@ -46,8 +46,8 @@ Language Item
 -------------
 | name        | type     | default | max length | min length | required | unique | regex | description                      |
 |-------------|----------|---------|------------|------------|----------|--------|-------|----------------------------------|
-| language_id | objectId |         | 10         |            |          |        |       | abbrev name for display(e.g. EN) |
-| level       | int      | 0       |            |            |          |        |       | language level                   |
+| language_id | objectId |         | 10         |            | true     |        |       | abbrev name for display(e.g. EN) |
+| level       | int      | 0       |            |            | true     |        |       | language level                   |
 
 Location
 --------
@@ -62,7 +62,7 @@ Place
 |--------------|---------------------|---------|------------|------------|----------|--------|-------|-----------------------------|
 | country_code | string              |         | 5          |            | true     |        |       | country abbrev              |
 | country      | string              |         | 50         |            | true     |        |       | country name                |
-| place_type   | string              |         | 20         |            |          |        |       | choices between (city, ...) |
+| place_type   | string              | city    | 20         |            |          |        |       | choices between (city, region) |
 | location     | embedded: Location  |         |            |            |          |        |       | location embedded object    |
 | full_name    | string              |         | 100        |            |          |        |       | place name, country name    |
 | name         | string              |         | 50         |            |          |        |       | place name                  |
