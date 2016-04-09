@@ -15,7 +15,7 @@ logger = logging.getLogger()
 
 
 # Auth
-class Role(db.Document, HasCustomValue, RoleMixin):
+class Role(db.DynamicDocument, HasCustomValue, RoleMixin):
     name = db.StringField(max_length=80, unique=True)
     description = db.StringField(max_length=255)
 
@@ -43,7 +43,7 @@ class UserLink(db.EmbeddedDocument):
 
 class User(db.DynamicDocument, HasCustomValue, UserMixin):
     name = db.StringField(max_length=255)
-    email = db.EmailField(max_length=255, unique=True)
+    email = db.EmailField(max_length=255, required=True, unique=True)
     password = db.StringField(max_length=255)
     active = db.BooleanField(default=True)
     confirmed_at = db.DateTimeField()
@@ -78,6 +78,23 @@ class User(db.DynamicDocument, HasCustomValue, UserMixin):
     gravatar_email = db.EmailField(max_length=255)
     avatar_file_path = db.StringField()
     avatar_url = db.StringField(max_length=255)
+    teach_langs = db.ListField(db.EmbeddedDocumentField(LanguageItem), default=[])
+    learn_langs = db.ListField(db.EmbeddedDocumentField(LanguageItem), default=[])
+    location = db.EmbeddedDocumentField(Location)
+    place = db.ReferenceField(Place, reverse_delete_rule=db.DENY)
+    birthday = db.DateTimeField(required=True)
+    gender = db.StringField(
+        choices=(
+            ("male", "male"),
+            ("female", "female"),
+            ("unknown", "unknown")
+        ),
+        default="unknown",
+        required=True
+    )
+    settings = db.EmbeddedDocumentField(UserSetting)
+    learn_points = db.EmbeddedDocument(LearnPoint)
+    nationality = db.StringField(required=True)
 
     def get_avatar_url(self, *args, **kwargs):
         if self.use_avatar_from == 'url':
@@ -162,7 +179,7 @@ class User(db.DynamicDocument, HasCustomValue, UserMixin):
         return Connection.objects(user_id=str(self.id))
 
 
-class Connection(db.Document):
+class Connection(db.DynamicDocument):
     user_id = db.ObjectIdField()
     provider_id = db.StringField(max_length=255)
     provider_user_id = db.StringField(max_length=255)
@@ -177,3 +194,77 @@ class Connection(db.Document):
     @property
     def user(self):
         return User.objects(id=self.user_id).first()
+
+    def __unicode__(self):
+        return u"{0}".format(self.user_id)
+
+
+class LanguageItem(db.EmbeddedDocument):
+    language_id = db.ObjectIdField(max_length=10, required=True)
+    level = db.IntField(default=0, required=True)
+
+    def __unicode__(self):
+        return u"{0} - {1}".format(self.language_id, self.level)
+
+
+class Location(db.EmbeddedDocument):
+    type = db.StringField(
+        choices=(
+            ("Point", "Point"),
+            ("Polygon", "Polygon"),
+            ("LineString", "LineString")
+        ),
+        default='Point')
+    coordinates = db.ListField(db.FloatField, default=[])
+
+    def __unicode__(self):
+        return u"{0} - {1}".format(self.type, self.coordinates)
+
+
+class Place(db.DynamicDocument, HasCustomValue):
+    country_code = db.StringField(max_length=5, required=True)
+    country = db.StringField(max_length=50, required=True)
+    place_type = db.StringField(
+        choices=(
+            ('city', 'city'),
+            ('region', 'region')
+        ),
+        max_length=20,
+        default='city'
+    )
+    location = db.EmbeddedDocumentField(Location)
+    full_name = db.StringField(max_length=100)
+    name = db.StringField(max_length=50)
+
+    def __unicode__(self):
+        return u"{0} - {1}".format(self.country_code, self.country)
+
+
+class UserSetting(db.EmbeddedDocumentField, HasCustomValue):
+    strict_lang_match = db.BooleanField(default=False)
+    same_gender = db.BooleanField(default=False)
+    age_range = db.ListField(db.IntField, default=[14, 90])
+    hide_from_nearby = db.BooleanField(default=False)
+    hide_from_search = db.BooleanField(default=False)
+    hide_info_fields = db.ListField(db.StringField, default=[])
+    partner_confirmation = db.BooleanField(default=True)
+
+    def __unicode__(self):
+        return u"{0} - {1} - {2} - {3} - {4} - {5} - {6} - {7}".format(self.strict_lang_match, self.same_gender,
+                                                                       self.age_range, self.hide_from_nearby,
+                                                                       self.hide_from_search, self.hide_info_fields,
+                                                                       self.partner_confirmation)
+
+
+class LearnPoint(db.EmbeddedDocumentField, HasCustomValue):
+    favorites = db.IntField(default=0)
+    pronunciations = db.IntField(default=0)
+    translations = db.IntField(default=0)
+    transliterations = db.IntField(default=0)
+    corrections = db.IntField(default=0)
+    transcriptions = db.IntField(default=0)
+
+    def __unicode__(self):
+        return u"{0} - {1} - {2} - {3} - {4} - {5} - {6}".format(self.favorites, self.pronunciations,
+                                                                 self.translations, self.transliterations,
+                                                                 self.corrections, self.transcriptions)
