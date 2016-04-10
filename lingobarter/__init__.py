@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from flask_socketio import SocketIO
+
 from lingobarter.core.admin import create_admin
 from lingobarter.core.app import LingobarterApp
 from lingobarter.core.middleware import HTTPMethodOverrideMiddleware
@@ -38,9 +40,10 @@ def create_app(config=None, test=False, admin_instance=None, **settings):
     app = create_app_base(
         config=config, test=test, **settings
     )
+    socket_io = SocketIO(app)
     # configure all the extensions
-    configure_extensions(app, admin_instance or admin)
+    configure_extensions(app, admin_instance or admin, socket_io)
     # http method override, by query params or headers
     if app.config.get("HTTP_PROXY_METHOD_OVERRIDE"):
         app.wsgi_app = HTTPMethodOverrideMiddleware(app.wsgi_app)
-    return app
+    return app, socket_io

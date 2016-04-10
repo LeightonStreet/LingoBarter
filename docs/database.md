@@ -42,12 +42,13 @@ User Collection
 | settings             | embedded: UserSetting         | pre-configured object |            |            |          |        |       | user settings                                        |
 | learn_points         | embedded: LearnPoint          | pre-configured object |            |            |          |        |       | user learn record                                    |
 | nationality          | string                        |                       |            |            | true     |        |       | country name                                         |
+| partners             | list (objectid)               | []                    |            |            |          |        |       | list of added partners                               |
 
 Language Item
 -------------
 | name        | type     | default | max length | min length | required | unique | regex | description                      |
 |-------------|----------|---------|------------|------------|----------|--------|-------|----------------------------------|
-| language_id | objectId |         | 10         |            | true     |        |       | abbrev name for display(e.g. EN) |
+| language_id | string   |         | 10         |            | true     |        |       | abbrev name for display(e.g. EN) |
 | level       | int      | 0       |            |            | true     |        |       | language level                   |
 
 Location
@@ -108,3 +109,32 @@ Language
 | name   | string |         | 50         |            | true     | true   |       | name of the language in latino  |
 | u_name | string |         | 100        |            |          |        |       | native name of the language     |
 | _id    | string |         | 10         |            | true     |        |       | abbrev name for display(e.g. EN)|
+
+Chat
+----
+| name    | type            | default         | max length | min length | required | unique | regex | description                                                                                                                |
+|---------|-----------------|-----------------|------------|------------|----------|--------|-------|----------------------------------------------------------------------------------------------------------------------------|
+| name    | string          | see description | 50         |            | true     |        |       | the name of chat will be ignored if it is a p2p chat and will be several users' username by default if it is a group chat  |
+| members | list (objectId) | []              |            |            |          |        |       | list of members' ids                                                                                                       |
+
+Message
+-------
+| name            | type     | default | max length | min length | required | unique | regex | description                         |
+|-----------------|----------|---------|------------|------------|----------|--------|-------|-------------------------------------|
+| from            | objectid |         |            |            | true     |        |       | message sender id                   |
+| to_chat         | objectid |         |            |            | true     |        |       | chat id                             |
+| type            | string   | text    |            |            | true     |        |       | choose between (text, voice, image) |
+| voice_file_path | string   |         |            |            |          |        |       |                                     |
+| text_content    | string   |         |            |            |          |        |       |                                     |
+| image_file_path | string   |         |            |            |          |        |       |                                     |
+| delivered       | boolean  | false   |            |            |          |        |       | whether the message is delivered    |
+| timestamp       | datetime | now     |            |            |          |        |       |                                     |
+
+Partner Request
+---------------
+| name      | type     | default | max length | min length | required | unique | regex | description                                         |
+|-----------|----------|---------|------------|------------|----------|--------|-------|-----------------------------------------------------|
+| from      | objectid |         |            |            | true     |        |       |                                                     |
+| to        | objectid |         |            |            | true     |        |       |                                                     |
+| timestamp | datetime | now     |            |            |          |        |       |                                                     |
+| status    | string   | pending |            |            |          |        |       | choose between (pending, added, rejected, outdated) |

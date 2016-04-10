@@ -62,6 +62,7 @@ by default it is in /modules, you can change if needed
 BLUEPRINTS_PATH = 'modules'
 BLUEPRINTS_MODULE_NAME = 'main'
 BLUEPRINTS_OBJECT_NAME = 'module'
+BLUEPRINTS_EVENTS_NAME = 'events'
 
 """
 Default configuration for FLask-Admin instance

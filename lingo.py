@@ -8,7 +8,7 @@ from lingobarter.core.db import db
 from lingobarter.ext.blueprints import blueprint_commands
 
 # create lingobarter application
-app = create_app()
+app, socket_io = create_app()
 # expose celery for celery worker
 if app.config.get('CELERY_ENABLED'):
     celery = app.celery
@@ -118,8 +118,7 @@ def runserver(reloader, debug, host, port):
     :param host:
     :param port:
     """
-    app.run(use_reloader=reloader, debug=debug, host=host, port=port)
-
+    socket_io.run(app, use_reloader=reloader, debug=debug, host=host, port=port)
 
 help_text = """
     Subcommands are loaded from the module/commands folder dynamically.

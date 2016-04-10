@@ -6,7 +6,7 @@ from . import (generic, babel, blueprints, error_handlers, before_request, mail,
                context_processors, views, fixtures, oauthlib, security, development, redis_session)
 
 
-def configure_extensions(app, admin):
+def configure_extensions(app, admin, socket_io):
     """
     configure all the extensions
     :param app:
@@ -24,7 +24,7 @@ def configure_extensions(app, admin):
     celery_app.create_celery_app(app)
     security.configure(app, db)
     fixtures.configure(app, db)
-    blueprints.load_from_folder(app)
+    blueprints.load_from_folder(app, socket_io)
     configure_admin(app, admin)
     development.configure(app, admin)
     before_request.configure(app)

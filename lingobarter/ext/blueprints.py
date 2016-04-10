@@ -9,7 +9,7 @@ from lingobarter.ext.commands_collector import CommandsCollector
 #     pass
 
 
-def load_from_folder(app):
+def load_from_folder(app, socket_io):
     """
         This code looks for any modules or packages in the given
         directory, loads them
@@ -32,6 +32,7 @@ def load_from_folder(app):
     mods = {}
     object_name = app.config.get('BLUEPRINTS_OBJECT_NAME', 'module')
     module_file = app.config.get('BLUEPRINTS_MODULE_NAME', 'main')
+    events_file = app.config.get('BLUEPRINTS_EVENTS_NAME', 'events')
     blueprint_module = module_file + '.py'
     for fname in dir_list:
         if not os.path.exists(os.path.join(path, fname, 'DISABLED')) and \
@@ -45,7 +46,14 @@ def load_from_folder(app):
             blueprint = getattr(mods[fname], object_name)
             app.logger.info("registering blueprint: %s" % blueprint.name)
             app.register_blueprint(blueprint)
-
+            # register socket.io events
+            module_events = ".".join([module_root, events_file])
+            try:
+                events = getattr(importlib.import_module(module_events), 'register_events')
+                app.logger.info("registering events for blueprint: %s" % blueprint.name)
+                events(socket_io)
+            except ImportError:
+                pass
             # TODO: admin pending!!!
             # register admin
             # try:
