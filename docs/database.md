@@ -15,6 +15,7 @@ User Collection
 | email                | email                         |                       | 255        |            | true     | true   |       | user email                                           |
 | password             | string                        |                       | 255        |            |          |        |       | user password                                        |
 | active               | boolean                       | true                  |            |            |          |        |       | user active or not                                   |
+| complete             | boolean                       | false                 |            |            |          |        |       | user's profile complete or not                       |
 | confirm_at           | datetime                      |                       |            |            |          |        |       | time of user email confirmation                      |
 | roles                | list (reference:Role)         | []                    |            |            |          |        |       | roles list of user                                   |
 | last_login_at        | datetime                      |                       |            |            |          |        |       | last login time                                      |
