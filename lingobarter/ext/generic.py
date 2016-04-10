@@ -11,7 +11,8 @@ def configure(app):
     :return:
     """
     Mistune(app)
-    CsrfProtect(app)
+    # TODO: shutdown csrf protection for now
+    # CsrfProtect(app)
     if app.config.get('GRAVATAR'):
         from flask.ext.gravatar import Gravatar
         Gravatar(app, **app.config.get('GRAVATAR'))

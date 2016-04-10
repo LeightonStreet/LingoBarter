@@ -1,38 +1,111 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from flask_restful import Resource
+
+from flask_restful import Resource, reqparse
+from flask_security import utils, auth_token_required
+from flask.ext.security.registerable import register_user
+from lingobarter.core.json import render_json
 from lingobarter.utils import get_current_user
-import json
-from bson import json_util
-from flask import request
+from .models import User
+
+"""
+Parsers
+=======
+one can extend from another
+"""
+loginParser = reqparse.RequestParser()
+loginParser.add_argument('email', type=str, required=True)
+loginParser.add_argument('password', type=str, required=True)
+
+signupParser = reqparse.RequestParser()
+signupParser.add_argument('email', type=str, required=True)
+signupParser.add_argument('name', type=str, required=True)
+signupParser.add_argument('username', type=str, required=True)
+signupParser.add_argument('password', type=str, required=True)
 
 
 class LoginResource(Resource):
     def post(self):
-        pass
+        # parse arguments
+        args = loginParser.parse_args()
+        # get user
+        user = User.get_user(email=args['email'])
+        if not user:
+            return render_json(message='User does not exist', status=404)
+        else:
+            if not utils.verify_and_update_password(args['password'], user):
+                return render_json(message='Invalid password', status=403)
+            else:
+                if not user.confirmed_at:
+                    return render_json(message='Please confirm your email address', status=403)
+                utils.login_user(user)
+                token = user.get_auth_token()
+                return {
+                    'message': 'Successfully log in',
+                    'status': '200',
+                    'response': {
+                        'auth_token': token,
+                        'user_id': str(user.id),
+                        'username': user.username,
+                        'name': user.name,
+                        'complete': user.complete
+                    }
+                }
+
 
 class LogoutResource(Resource):
-    def post(self):
-        pass
-
-
-class SignupResource(Resource):
-    def post(self):
-        pass
+    def get(self):
+        utils.logout_user()
+        return {'message': 'Successfully log out', 'status': '200'}
 
 
 class UserResource(Resource):
-    # get user profile
-    def get(self, user_id):
-        current_user = get_current_user()
-        if user_id == current_user.get_id():
-            return json.dumps(current_user, default=json_util.default)
-        else:
-            pass
-
+    """
+    Sign up
+    """
     def post(self):
-        form = self.form(request.form)
-        if form.validate():
-            user = get_current_user()
-            # todo: update fields
-            user.save()
+        # parse arguments
+        args = loginParser.parse_args()
+        user = register_user(**args)
+        return {
+            'message': 'User has been created. You need to confirm the email to log in',
+            'status': '200',
+            'response': {
+                'email': user.email
+            }
+        }
+
+    """
+    User view him/her self
+    """
+    @auth_token_required
+    def get(self):
+        user = get_current_user()
+        return render_json(message="Successfully get user's own profile",
+                           status=200,
+                           id=str(user.id),
+                           email=user.email)
+
+    """
+    User configure & update him/her self
+    """
+    @auth_token_required
+    def put(self):
+        pass
+
+    """
+    User delete his/her own account
+    """
+    @auth_token_required
+    def delete(self):
+        pass
+
+
+class UserViewResource(Resource):
+    """
+    User profile view
+    """
+
+    @auth_token_required
+    def get(self, user_id):
+        return {'message': user_id}

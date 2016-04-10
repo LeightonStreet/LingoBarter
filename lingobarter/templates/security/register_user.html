@@ -44,6 +44,12 @@
                     </div>
                     <div class="field">
                         <div class="ui left icon input">
+                            <i class="user icon"></i>
+                            {{ register_user_form.username(placeholder="Username") | safe }}
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui left icon input">
                             <i class="mail icon"></i>
                             {{ register_user_form.email(placeholder="Email address") | safe }}
                         </div>
@@ -73,6 +79,7 @@
                 <div class="ui error message" style="display:
                         {% if register_user_form.email.errors
                     or register_user_form.name.errors
+                    or register_user_form.username.errors
                     or register_user_form.password.errors
                     or register_user_form.password_confirm.errors
                     or (config.get('SECURITY_RECAPTCHA_ENABLED') and register_user_form.recaptcha.errors) %} block; {% endif %}">
@@ -82,6 +89,9 @@
                         {% endif %}
                         {% if register_user_form.name.errors %}
                             <li>Name: {{ register_user_form.name.errors[0] }}</li>
+                        {% endif %}
+                        {% if register_user_form.username.errors %}
+                            <li>Username: {{ register_user_form.username.errors[0] }}</li>
                         {% endif %}
                         {% if register_user_form.password.errors %}
                             <li>Password: {{ register_user_form.password.errors[0] }}</li>

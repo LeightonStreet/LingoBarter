@@ -29,7 +29,7 @@ class LingobarterApi(Api):
         :return:
         """
         self.name = 'api.' + str(version)
-        super(LingobarterApi, self).__init__(app=app, prefix='/api/' + str(version))
+        super(LingobarterApi, self).__init__(app=app, prefix='/api/' + str(version), catch_all_404s=True)
 
     def add_lingobarter_resource(self, resource, *urls, **kwargs):
         endpoint = kwargs.get('endpoint', None)

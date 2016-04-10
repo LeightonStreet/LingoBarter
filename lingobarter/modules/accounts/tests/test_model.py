@@ -39,6 +39,7 @@ class TestAccountsModels(BaseTestCase):
 
     def test_user_fields(self):
         self.assertIsInstance(self.user, User)
+        self.assertIsNotNone(self.user.id)
         self.assertEqual(self.user.username, u'guybrush-treepwood')
         self.assertEqual(self.user.name, u'Guybrush Treepwood')
         self.assertEqual(self.user.email, u'guybrush@monkeyisland.com')
