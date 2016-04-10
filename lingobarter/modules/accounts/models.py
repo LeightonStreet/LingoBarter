@@ -178,6 +178,9 @@ class User(db.DynamicDocument, HasCustomValue, UserMixin):
     def connections(self):
         return Connection.objects(user_id=str(self.id))
 
+    def get_id(self):
+        return self._id
+
 
 class Connection(db.DynamicDocument):
     user_id = db.ObjectIdField()
