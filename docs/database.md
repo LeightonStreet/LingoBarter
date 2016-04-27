@@ -121,7 +121,7 @@ Message
 -------
 | name            | type     | default | max length | min length | required | unique | regex | description                         |
 |-----------------|----------|---------|------------|------------|----------|--------|-------|-------------------------------------|
-| from            | objectid |         |            |            | true     |        |       | message sender id                   |
+| from_id         | objectid |         |            |            | true     |        |       | message sender id                   |
 | to_chat         | objectid |         |            |            | true     |        |       | chat id                             |
 | type            | string   | text    |            |            | true     |        |       | choose between (text, voice, image) |
 | voice_file_path | string   |         |            |            |          |        |       |                                     |
@@ -134,7 +134,7 @@ Partner Request
 ---------------
 | name      | type     | default | max length | min length | required | unique | regex | description                                         |
 |-----------|----------|---------|------------|------------|----------|--------|-------|-----------------------------------------------------|
-| from      | objectid |         |            |            | true     |        |       |                                                     |
-| to        | objectid |         |            |            | true     |        |       |                                                     |
+| from_id   | objectid |         |            |            | true     |        |       |                                                     |
+| to_id     | objectid |         |            |            | true     |        |       |                                                     |
 | timestamp | datetime | now     |            |            |          |        |       |                                                     |
 | status    | string   | pending |            |            |          |        |       | choose between (pending, added, rejected, outdated) |
