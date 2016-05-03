@@ -273,3 +273,12 @@ class Connection(db.Document):
 
     def __unicode__(self):
         return u"{0}".format(self.user_id)
+
+
+class Language(db.DynamicDocument, HasCustomValue):
+    name = db.StringField(max_length=50, required=True, unique=True)
+    u_name = db.StringField(max_length=100)
+    _id = db.StringField(max_length=10, required=True)
+
+    def __unicode__(self):
+        return u"{0} - {1} - {2}".format(self.name, self.u_name, self._id)
