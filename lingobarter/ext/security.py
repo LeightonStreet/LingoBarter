@@ -13,7 +13,6 @@ class Security(_Security):
 
 
 class ExtendedRegisterForm(RegisterForm):
-    name = StringField('Name', [Required()])
     username = StringField('Username', [Required()])
 
 
