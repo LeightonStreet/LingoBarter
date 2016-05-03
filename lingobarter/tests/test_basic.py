@@ -27,10 +27,11 @@ class BasicTestCase(TestCase):
 
     def create_app(self):
         self.admin = create_admin()
+        # create_app return a tuple, app object is at index 0
         return create_app(config='lingobarter.test_settings',
                           DEBUG=False,
                           test=True,
-                          admin_instance=self.admin)
+                          admin_instance=self.admin)[0]
 
     def test_has_mongoengine(self):
         self.assertTrue(self.app.extensions.get('mongoengine'))

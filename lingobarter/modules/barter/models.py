@@ -4,6 +4,7 @@
 from lingobarter.core.db import db
 from lingobarter.core.models.custom_values import HasCustomValue
 
+
 class Chat(db.DynamicDocument, HasCustomValue):
     # todo: the name of chat will be ignored if it is a p2p chat
     # todo: and will be several users' username by default if it is a group chat
@@ -11,7 +12,7 @@ class Chat(db.DynamicDocument, HasCustomValue):
     members = db.ListField(db.ObjectIdField, default=[])
 
     def __unicode__(self):
-        return u"{0} - {1} - {2}".format(self.name, self.u_name, self._id)
+        return u"{0} - {1}".format(self.name, self._id)
 
 
 class Message(db.DynamicDocument, HasCustomValue):

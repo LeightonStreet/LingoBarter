@@ -9,9 +9,10 @@ from lingobarter.utils.shorturl import ShorterURL
 
 class TestShorterUrl(unittest.TestCase):
     def create_app(self):
+        # create_app return a tuple, app object is at index 0
         return create_app(config='lingobarter.test_settings',
                           DEBUG=False,
-                          test=True)
+                          test=True)[0]
 
     def test_usage(self):
         url = 'http://google.com'
