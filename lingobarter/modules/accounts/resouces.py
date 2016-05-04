@@ -13,13 +13,13 @@ Parsers
 =======
 one can extend from another
 """
+# LoginResource:post
 loginParser = reqparse.RequestParser()
 loginParser.add_argument('email', type=str, required=True)
 loginParser.add_argument('password', type=str, required=True)
 
 signupParser = reqparse.RequestParser()
 signupParser.add_argument('email', type=str, required=True)
-signupParser.add_argument('name', type=str, required=True)
 signupParser.add_argument('username', type=str, required=True)
 signupParser.add_argument('password', type=str, required=True)
 
@@ -34,29 +34,22 @@ class LoginResource(Resource):
             return render_json(message='User does not exist', status=404)
         else:
             if not utils.verify_and_update_password(args['password'], user):
-                return render_json(message='Invalid password', status=403)
+                return render_json(message='Invalid password', status=406)
             else:
                 if not user.confirmed_at:
                     return render_json(message='Please confirm your email address', status=403)
                 utils.login_user(user)
                 token = user.get_auth_token()
-                return {
-                    'message': 'Successfully log in',
-                    'status': '200',
-                    'response': {
-                        'auth_token': token,
-                        'user_id': str(user.id),
-                        'username': user.username,
-                        'name': user.name,
-                        'complete': user.complete
-                    }
-                }
+                return render_json(message='Successfully log in', status=200,
+                                   auth_token=token, user_id=str(user.id),
+                                   username=user.username, name=user.name,
+                                   complete=user.complete)
 
 
 class LogoutResource(Resource):
     def get(self):
         utils.logout_user()
-        return {'message': 'Successfully log out', 'status': '200'}
+        return render_json(message='Successfully log out', status=200)
 
 
 class UserResource(Resource):
@@ -67,13 +60,8 @@ class UserResource(Resource):
         # parse arguments
         args = loginParser.parse_args()
         user = register_user(**args)
-        return {
-            'message': 'User has been created. You need to confirm the email to log in',
-            'status': '200',
-            'response': {
-                'email': user.email
-            }
-        }
+        return render_json(message='User has been created. You need to confirm the email to log in', status=200,
+                           email=user.email)
 
     """
     User view him/her self
