@@ -19,4 +19,4 @@ module.add_url_rule('/accounts/profile/edit/',
 api_v1.add_lingobarter_resource(LoginResource, '/accounts/authorize')
 api_v1.add_lingobarter_resource(LogoutResource, '/accounts/unauthorize')
 api_v1.add_lingobarter_resource(UserResource, '/users')
-api_v1.add_lingobarter_resource(UserViewResource, '/users/<user_id>')
+api_v1.add_lingobarter_resource(UserViewResource, '/users/<username>')
