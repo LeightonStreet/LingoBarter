@@ -93,10 +93,8 @@ class UserResource(Resource):
                 'bio': user.bio,
                 'teach_langs': teach_languages,
                 'learn_langs': learn_languages,
-                'location': {
-                    'type': user.location.type,
-                    'coordinates': user.location.coordinates
-                },
+                'location': None if user.location is None
+                    else {'type': user.location.type, 'coordinates': user.location.coordinates},
                 'birthday': user.birthday,
                 'gender': user.gender,
                 'nationality': user.nationality
@@ -160,10 +158,8 @@ class UserViewResource(Resource):
                 'bio': user.bio,
                 'teach_langs': teach_languages,
                 'learn_langs': learn_languages,
-                'location': {
-                    'type': user.location.type,
-                    'coordinates': user.location.coordinates
-                },
+                'location': None if user.location is None
+                    else {'type': user.location.type, 'coordinates': user.location.coordinates},
                 'birthday': user.birthday,
                 'gender': user.gender,
                 'nationality': user.nationality
