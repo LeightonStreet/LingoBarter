@@ -47,6 +47,10 @@ class LoginResource(Resource):
 
 
 class LogoutResource(Resource):
+    """
+    Log out
+    """
+    @auth_token_required
     def get(self):
         utils.logout_user()
         return render_json(message='Successfully log out', status=200)
@@ -58,7 +62,7 @@ class UserResource(Resource):
     """
     def post(self):
         # parse arguments
-        args = loginParser.parse_args()
+        args = signupParser.parse_args()
         user = register_user(**args)
         return render_json(message='User has been created. You need to confirm the email to log in', status=200,
                            email=user.email)
