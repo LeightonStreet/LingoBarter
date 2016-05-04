@@ -65,3 +65,9 @@ local_settings.py
 
 # mac filesystem metadata
 .DS_Store
+
+#.rdb
+dump.rdb
+
+tests/local_*
+
