@@ -150,7 +150,7 @@ class UserViewResource(Resource):
             })
 
         return render_json(
-            message='Get his/her own profile',
+            message='View ' + username + "'s profile",
             status=200,
             response={
                 'name': user.username if user.name is None else user.name,
