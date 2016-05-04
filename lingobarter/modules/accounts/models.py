@@ -254,6 +254,10 @@ class User(db.DynamicDocument, HasCustomValue, UserMixin):
     def get_user(cls, email):
         return cls.objects(email=email).first()
 
+    @classmethod
+    def get_user_by_username(cls, username):
+        return cls.objects(username=username).first()
+
 
 class Connection(db.Document):
     user_id = db.ObjectIdField()

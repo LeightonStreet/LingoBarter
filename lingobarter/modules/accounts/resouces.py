@@ -76,15 +76,44 @@ class UserResource(Resource):
         }
 
     """
-    User view him/her self
+    User view him/her own profile
     """
     @auth_token_required
     def get(self):
         user = get_current_user()
-        return render_json(message="Successfully get user's own profile",
-                           status=200,
-                           id=str(user.id),
-                           email=user.email)
+        teach_languages = []
+        learn_languages = []
+
+        for tech_language in user.teach_langs:
+            teach_languages.append({
+                'language_id': tech_language.language_id,
+                'level': tech_language.level
+            })
+
+        for learn_language in user.learn_langs:
+            learn_languages.append({
+                'language_id': learn_language.language_id,
+                'level': learn_language.level
+            })
+
+        return render_json(
+            message='Get his/her own profile',
+            status=200,
+            response={
+                'name': user.username if user.name is None else user.name,
+                'tagline': user.tagline,
+                'bio': user.bio,
+                'teach_langs': teach_languages,
+                'learn_langs': learn_languages,
+                'location': {
+                    'type': user.location.type,
+                    'coordinates': user.location.coordinates
+                },
+                'birthday': user.birthday,
+                'gender': user.gender,
+                'nationality': user.nationality
+            }
+        )
 
     """
     User configure & update him/her self
@@ -106,6 +135,49 @@ class UserViewResource(Resource):
     User profile view
     """
 
+    """
+    User view other user's profile
+    """
     @auth_token_required
-    def get(self, user_id):
-        return {'message': user_id}
+    def get(self, username):
+        user = User.get_user_by_username(username)
+
+        if user is None:
+            return render_json(
+                message='Username: ' + username + ' does not exist.',
+                status=404
+            )
+
+        teach_languages = []
+        learn_languages = []
+
+        for tech_language in user.teach_langs:
+            teach_languages.append({
+                'language_id': tech_language.language_id,
+                'level': tech_language.level
+            })
+
+        for learn_language in user.learn_langs:
+            learn_languages.append({
+                'language_id': learn_language.language_id,
+                'level': learn_language.level
+            })
+
+        return render_json(
+            message='Get his/her own profile',
+            status=200,
+            response={
+                'name': user.username if user.name is None else user.name,
+                'tagline': user.tagline,
+                'bio': user.bio,
+                'teach_langs': teach_languages,
+                'learn_langs': learn_languages,
+                'location': {
+                    'type': user.location.type,
+                    'coordinates': user.location.coordinates
+                },
+                'birthday': user.birthday,
+                'gender': user.gender,
+                'nationality': user.nationality
+            }
+        )
