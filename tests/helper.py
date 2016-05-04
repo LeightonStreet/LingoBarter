@@ -21,4 +21,18 @@ def get(endpoint, auth=None):
     return r.json()
 
 
-print post(endpoint="/accounts/authorize", email="jet.in.brain@gmail.com", password="ll1222")
+def put(endpoint, auth=None, **kwargs):
+    headers = {'content-type': 'application/json'}
+    if auth:
+        headers['Authentication-Token'] = auth
+    payload = json.dumps(kwargs)
+    r = requests.put(url_base + endpoint, data=payload, headers=headers)
+    return r.json()
+
+
+def delete(endpoint, auth=None):
+    headers = {}
+    if auth:
+        headers['Authentication-Token'] = auth
+    r = requests.delete(url_base + endpoint, headers=headers)
+    return r.json()
