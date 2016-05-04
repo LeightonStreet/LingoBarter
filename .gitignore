@@ -68,3 +68,6 @@ local_settings.py
 
 #.rdb
 dump.rdb
+
+tests/local_*
+
