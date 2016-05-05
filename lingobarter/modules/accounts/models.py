@@ -57,7 +57,7 @@ class Location(db.EmbeddedDocument):
             ("LineString", "LineString")
         ),
         default='Point')
-    coordinates = db.ListField(db.FloatField, default=[])
+    coordinates = db.ListField(db.FloatField(), default=[])
 
     def __unicode__(self):
         return u"{0} - {1}".format(self.type, self.coordinates)
@@ -82,23 +82,23 @@ class Place(db.DynamicDocument, HasCustomValue):
         return u"{0} - {1}".format(self.country_code, self.country)
 
 
-class UserSetting(db.EmbeddedDocument, HasCustomValue):
+class UserSetting(db.EmbeddedDocument):
     strict_lang_match = db.BooleanField(default=False)
     same_gender = db.BooleanField(default=False)
-    age_range = db.ListField(db.IntField, default=[14, 90])
+    age_range = db.ListField(db.IntField(), default=[14, 90])
     hide_from_nearby = db.BooleanField(default=False)
     hide_from_search = db.BooleanField(default=False)
-    hide_info_fields = db.ListField(db.StringField, default=[])
+    hide_info_fields = db.ListField(db.StringField(), default=[])
     partner_confirmation = db.BooleanField(default=True)
 
     def __unicode__(self):
-        return u"{0} - {1} - {2} - {3} - {4} - {5} - {6} - {7}".format(self.strict_lang_match, self.same_gender,
+        return u"{0} - {1} - {2} - {3} - {4} - {5} - {6}".format(self.strict_lang_match, self.same_gender,
                                                                        self.age_range, self.hide_from_nearby,
                                                                        self.hide_from_search, self.hide_info_fields,
                                                                        self.partner_confirmation)
 
 
-class LearnPoint(db.EmbeddedDocument, HasCustomValue):
+class LearnPoint(db.EmbeddedDocument):
     favorites = db.IntField(default=0)
     pronunciations = db.IntField(default=0)
     translations = db.IntField(default=0)
@@ -107,7 +107,7 @@ class LearnPoint(db.EmbeddedDocument, HasCustomValue):
     transcriptions = db.IntField(default=0)
 
     def __unicode__(self):
-        return u"{0} - {1} - {2} - {3} - {4} - {5} - {6}".format(self.favorites, self.pronunciations,
+        return u"{0} - {1} - {2} - {3} - {4} - {5}".format(self.favorites, self.pronunciations,
                                                                  self.translations, self.transliterations,
                                                                  self.corrections, self.transcriptions)
 
@@ -145,7 +145,7 @@ class User(db.DynamicDocument, HasCustomValue, UserMixin):
             ("upload", "upload"),
             ("facebook", "facebook")
         ),
-        default='gravatar'
+        default='upload'
     )
     gravatar_email = db.EmailField(max_length=255)
     avatar_file_path = db.StringField()
@@ -164,8 +164,8 @@ class User(db.DynamicDocument, HasCustomValue, UserMixin):
         default="unknown",
         required=True
     )
-    settings = db.EmbeddedDocumentField(UserSetting)
-    learn_points = db.EmbeddedDocumentField(LearnPoint)
+    settings = db.EmbeddedDocumentField(UserSetting, default=UserSetting())
+    learn_points = db.EmbeddedDocumentField(LearnPoint, default=LearnPoint())
     nationality = db.StringField()
 
     def get_avatar_url(self, *args, **kwargs):

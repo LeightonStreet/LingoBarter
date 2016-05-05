@@ -5,7 +5,7 @@ from flask_restful import Resource, reqparse
 from flask_security import utils, auth_token_required
 from flask.ext.security.registerable import register_user
 from lingobarter.core.json import render_json
-from lingobarter.utils import get_current_user
+from lingobarter.utils import get_current_user, dateformat
 from .models import User
 
 """
@@ -31,13 +31,13 @@ class LoginResource(Resource):
         # get user
         user = User.get_user(email=args['email'])
         if not user:
-            return render_json(message='User does not exist', status=404)
+            return render_json(message={'email': 'User does not exist'}, status=404)
         else:
             if not utils.verify_and_update_password(args['password'], user):
-                return render_json(message='Invalid password', status=406)
+                return render_json(message={'password': 'Invalid password'}, status=406)
             else:
                 if not user.confirmed_at:
-                    return render_json(message='Please confirm your email address', status=403)
+                    return render_json(message={'email': 'Please confirm your email address'}, status=403)
                 utils.login_user(user)
                 token = user.get_auth_token()
                 return render_json(message='Successfully log in', status=200,
@@ -63,6 +63,17 @@ class UserResource(Resource):
     def post(self):
         # parse arguments
         args = signupParser.parse_args()
+        unique_flag = False
+        message = {}
+        if User.get_user(args['email']):
+            unique_flag = True
+            message['email'] = 'Email address has been taken'
+        if User.get_user_by_username(args['username']):
+            unique_flag = True
+            message['username'] = 'Username has been taken'
+        if unique_flag:
+            return render_json(message=message, status=409)
+
         user = register_user(**args)
         return render_json(message='User has been created. You need to confirm the email to log in', status=200,
                            email=user.email)
@@ -89,18 +100,23 @@ class UserResource(Resource):
             })
 
         return render_json(
-            message='Get his/her own profile',
+            message='Successfully get user own profile',
             status=200,
             response={
                 'name': user.username if user.name is None else user.name,
+                'email': user.email,
+                'username': user.username,
                 'tagline': user.tagline,
                 'bio': user.bio,
+                'avatar_url': user.get_avatar_url() if user.avatar_file_path is not None else None,
                 'teach_langs': teach_languages,
                 'learn_langs': learn_languages,
                 'location': None if user.location is None
                     else {'type': user.location.type, 'coordinates': user.location.coordinates},
-                'birthday': user.birthday,
+                'birthday': dateformat.datetime_to_timestamp(user.birthday),
                 'gender': user.gender,
+                'settings': user.settings.to_mongo(),
+                'learn_points': user.learn_points.to_mongo(),
                 'nationality': user.nationality
             }
         )
@@ -134,7 +150,7 @@ class UserViewResource(Resource):
 
         if user is None:
             return render_json(
-                message='Username: ' + username + ' does not exist.',
+                message={'username': username + ' does not exist'},
                 status=404
             )
 
@@ -153,19 +169,29 @@ class UserViewResource(Resource):
                 'level': learn_language.level
             })
 
+        # could be ['location', 'nationality', 'birthday', 'current_login_at', 'gender']
+        invisible_fields = user.settings.hide_info_fields
+
+        print type(user.current_login_at)
+
         return render_json(
             message='View ' + username + "'s profile",
             status=200,
             response={
                 'name': user.username if user.name is None else user.name,
+                'username': user.username,
                 'tagline': user.tagline,
                 'bio': user.bio,
+                'avatar_url': user.get_avatar_url() if user.avatar_file_path is not None else None,
                 'teach_langs': teach_languages,
                 'learn_langs': learn_languages,
-                'location': None if user.location is None
-                    else {'type': user.location.type, 'coordinates': user.location.coordinates},
-                'birthday': user.birthday,
-                'gender': user.gender,
-                'nationality': user.nationality
+                'location': {'type': user.location.type, 'coordinates': user.location.coordinates}
+                    if user.location and 'location' not in invisible_fields else None,
+                'birthday': dateformat.datetime_to_timestamp(user.birthday)
+                    if 'birthday' not in invisible_fields else None,
+                'gender': user.gender if 'gender' not in invisible_fields else None,
+                'nationality': user.nationality if 'nationality' not in invisible_fields else None,
+                'current_login_at': dateformat.datetime_to_timestamp(user.current_login_at)
+                    if 'current_login_at' not in invisible_fields else None
             }
         )

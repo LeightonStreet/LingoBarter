@@ -1,6 +1,22 @@
 # coding: utf: 8
 
 
+def datetime_to_timestamp(date):
+    if date is None:
+        return None
+
+    import time
+    return time.mktime(date.timetuple())
+
+
+def timestamp_to_datetime(unix_time):
+    if unix_time is None:
+        return None
+
+    from datetime import datetime
+    return datetime.fromtimestamp(unix_time)
+
+
 def pretty_date(time=None):  # noqa
     """
     Get a datetime object or a int() Epoch timestamp and return a
