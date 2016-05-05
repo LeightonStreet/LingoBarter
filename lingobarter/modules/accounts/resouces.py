@@ -13,7 +13,6 @@ import json
 import datetime
 import pytz
 from lingobarter.modules.accounts.models import Location, LanguageItem
-from lingobarter.core.db import db
 
 """
 Parsers
@@ -148,7 +147,7 @@ class UserResource(Resource):
         user = get_current_user()
 
         # get new profile
-        new_profile = json.loads(json.loads(request.data, object_hook=json_util.object_hook)['data'])
+        new_profile = json.loads(request.data, object_hook=json_util.object_hook)
 
         # parse new profile
         user.name = new_profile['name']                 # update name
@@ -179,19 +178,17 @@ class UserResource(Resource):
         if user.location is None:
             user.location = Location()
         user.location.type = new_profile['location']['type']
-        user.location.coordinates = [db.FloatField(x) for x in new_profile['location']['coordinates']]
+        user.location.coordinates = [float(x) for x in new_profile['location']['coordinates']]
 
-        # update birthday
-        new_ts = new_profile['birthday']['$date']
-        user.birthday = datetime.datetime.fromtimestamp(new_ts/1000, pytz.timezone('GMT'))
-
+        user.birthday = dateformat.timestamp_to_datetime(new_profile['birthday']) # update birthday
         user.gender = new_profile['gender']             # update gender
         user.nationality = new_profile['nationality']   # update nationality
 
-        if user.save():
+        try:
+            user.save()
             return render_json(message='Successfully updated user profile', status=200)
-        else:
-            return render_json(message='Fail to update user profile', status=400)
+        except Exception as err:
+            return render_json(message=err.message, status=502)
 
 
 
