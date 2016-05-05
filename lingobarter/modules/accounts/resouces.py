@@ -7,6 +7,8 @@ import json
 import os
 from bson import json_util
 from flask import request, current_app
+from flask.ext.security.confirmable import send_confirmation_instructions
+from flask.ext.security.recoverable import send_reset_password_instructions
 from flask.ext.security.registerable import register_user
 from flask_restful import Resource, reqparse, fields
 from flask_security import utils, auth_token_required
@@ -249,7 +251,10 @@ class UserResource(Resource):
         """
         User delete his/her own account
         """
-        pass
+        user = get_current_user()
+        user.delete()
+        # todo: delete other related data
+        return render_json(message='Successfully delete account', status=200)
 
 
 class UserViewResource(Resource):
@@ -341,5 +346,67 @@ class UploadAvatar(Resource):
                     if exc.errno != errno.EEXIST:
                         return render_json(message=exc.message, status=502)
             f.save(abs_name)
+            user.avatar_file_path = os.path.join(user.username, filename)
+            user.save()
             return render_json(message='File is saved successfully', status=200)
         return render_json(message='hello', status=400)
+
+
+class UsernameResource(Resource):
+    @auth_token_required
+    def put(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('username', type=str, required=True)
+        args = parser.parse_args()
+
+        # get current user
+        user = get_current_user()
+
+        if user.username == args['username']:
+            return render_json(message={'username': 'Unchanged username'}, status=304)
+
+        if User.get_user_by_username(args['username']):
+            return render_json(message={'username': 'Username has been taken'}, status=409)
+
+        user.username = args['username']
+        user.save()
+        return render_json(message='Successfully change username', status=200)
+
+
+class PasswordResource(Resource):
+    @auth_token_required
+    def put(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('cur_password', type=str, required=True)
+        parser.add_argument('new_password', type=str, required=True)
+        args = parser.parse_args()
+
+        # get current user
+        user = get_current_user()
+
+        if not utils.verify_and_update_password(args['cur_password'], user):
+            return render_json(message={'cur_password': 'Invalid password'}, status=406)
+
+        user.set_password(args['new_password'], save=True)
+
+        return render_json(message='Successfully change password', status=200)
+
+
+class PasswordResetResource(Resource):
+    @auth_token_required
+    def get(self):
+        if not current_app.config['SECURITY_RECOVERABLE']:
+            return render_json(message='Security configuration does not allow this operation', status=403)
+        user = get_current_user()
+        send_reset_password_instructions(user)
+        return render_json(message='Successfully send password reset instruction', status=200)
+
+
+class ConfirmationRequestResource(Resource):
+    @auth_token_required
+    def get(self):
+        if not current_app.config['SECURITY_CONFIRMABLE']:
+            return render_json(message='Security configuration does not allow this operation', status=403)
+        user = get_current_user()
+        send_confirmation_instructions(user)
+        return render_json(message='Successfully send confirmation instruction', status=200)
