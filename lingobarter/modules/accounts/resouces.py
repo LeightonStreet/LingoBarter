@@ -1,12 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask_restful import Resource, reqparse
+from flask import request
+from flask_restful import Resource, reqparse, fields
 from flask_security import utils, auth_token_required
 from flask.ext.security.registerable import register_user
 from lingobarter.core.json import render_json
 from lingobarter.utils import get_current_user
 from .models import User
+from bson import json_util
+import json
+import datetime
+import pytz
+from lingobarter.modules.accounts.models import Location, LanguageItem
+from lingobarter.core.db import db
 
 """
 Parsers
@@ -23,6 +30,16 @@ signupParser.add_argument('email', type=str, required=True)
 signupParser.add_argument('username', type=str, required=True)
 signupParser.add_argument('password', type=str, required=True)
 
+updateProfileParse = reqparse.RequestParser()
+updateProfileParse.add_argument('name', type=str, help='invalid name')
+updateProfileParse.add_argument('tagline', type=str, help='invalid tagline')
+updateProfileParse.add_argument('bio', type=str, help='invalid bio')
+updateProfileParse.add_argument('teach_langs', type=list, help='invalid teach_langs') # todo
+updateProfileParse.add_argument('learn_langs', type=list, help='invalid learn_langs') # todo
+updateProfileParse.add_argument('location', type=dict, help='invalid location') #todo
+updateProfileParse.add_argument('birthday', type=fields.datetime, help='invalid birthday') #todo
+updateProfileParse.add_argument('gender', type=str, help='invalid gender')
+updateProfileParse.add_argument('nationality', type=str, help='invalid nationality')
 
 class LoginResource(Resource):
     def post(self):
@@ -106,11 +123,62 @@ class UserResource(Resource):
         )
 
     """
-    User configure & update him/her self
+    User configure & update himself/ herself's profile
+    Note: User can never update email or username
     """
     @auth_token_required
     def put(self):
-        pass
+        # get current user
+        user = get_current_user()
+
+        # get new profile
+        new_profile = json.loads(json.loads(request.data, object_hook=json_util.object_hook)['data'])
+
+        # parse new profile
+        user.name = new_profile['name']                 # update name
+        user.tagline = new_profile['tagline']           # update tagline
+        user.bio = new_profile['bio']                   # update bio
+
+        # update teach_langs
+        new_teach_langs = new_profile['teach_langs']
+        new_teach_languageitem_list = []
+        for language in new_teach_langs:
+            new_language_item = LanguageItem()
+            new_language_item.language_id = language['language_id']
+            new_language_item.level = int(language['level'])
+            new_teach_languageitem_list.append(new_language_item)
+        user.teach_langs = new_teach_languageitem_list
+
+        # update learn_langs
+        new_learn_langs = new_profile['learn_langs']
+        new_learn_languageitem_list = []
+        for language in new_learn_langs:
+            new_language_item = LanguageItem()
+            new_language_item.language_id = language['language_id']
+            new_language_item.level = int(language['level'])
+            new_learn_languageitem_list.append(new_language_item)
+        user.learn_langs = new_learn_languageitem_list
+
+        # update location
+        if user.location is None:
+            user.location = Location()
+        user.location.type = new_profile['location']['type']
+        user.location.coordinates = [db.FloatField(x) for x in new_profile['location']['coordinates']]
+
+        # update birthday
+        new_ts = new_profile['birthday']['$date']
+        user.birthday = datetime.datetime.fromtimestamp(new_ts/1000, pytz.timezone('GMT'))
+
+        user.gender = new_profile['gender']             # update gender
+        user.nationality = new_profile['nationality']   # update nationality
+
+        if user.save():
+            return render_json(message='Successfully updated user profile', status=200)
+        else:
+            return render_json(message='Fail to update user profile', status=400)
+
+
+
 
     """
     User delete his/her own account
