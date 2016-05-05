@@ -37,7 +37,7 @@ User Collection
 | learn_langs          | list (embedded: LanguageItem) | []                    |            |            |          |        |       | languages user learns                                |
 | location             | embedded: Location            |                       |            |            |          |        |       | location type & location coordinate                  |
 | place                | reference: Place              |                       |            |            |          |        |       | place document                                       |
-| birthdate            | datetime                      |                       |            |            | true     |        |       | use birthdate to generate virtual property age       |
+| birthday             | datetime                      |                       |            |            | true     |        |       | use birthdate to generate virtual property age       |
 | gender               | string                        | unknown               |            |            | true     |        |       | choices between (male, female, unknown)              |
 | settings             | embedded: UserSetting         | pre-configured object |            |            |          |        |       | user settings                                        |
 | learn_points         | embedded: LearnPoint          | pre-configured object |            |            |          |        |       | user learn record                                    |
