@@ -157,39 +157,83 @@ class UserResource(Resource):
         new_profile = json.loads(request.data, object_hook=json_util.object_hook)
 
         # parse new profile
-        user.name = new_profile['name']                 # update name
-        user.tagline = new_profile['tagline']           # update tagline
-        user.bio = new_profile['bio']                   # update bio
+        user.name = new_profile['name'] if new_profile.get('name') is not None else user.name             # update name
+        user.tagline = new_profile['tagline'] if new_profile.get('tagline') is not None else user.tagline # update tagline
+        user.bio = new_profile['bio'] if new_profile.get('bio') is not None else user.bio                 # update bio
 
         # update teach_langs
-        new_teach_langs = new_profile['teach_langs']
-        new_teach_languageitem_list = []
-        for language in new_teach_langs:
-            new_language_item = LanguageItem()
-            new_language_item.language_id = language['language_id']
-            new_language_item.level = int(language['level'])
-            new_teach_languageitem_list.append(new_language_item)
-        user.teach_langs = new_teach_languageitem_list
+        new_teach_langs = new_profile.get('teach_langs')
+        if new_teach_langs is not None:
+            new_teach_languageitem_list = []
+            for language in new_teach_langs:
+                new_language_item = LanguageItem()
+                new_language_item.language_id = language['language_id']
+                new_language_item.level = int(language['level'])
+                new_teach_languageitem_list.append(new_language_item)
+            user.teach_langs = new_teach_languageitem_list
 
         # update learn_langs
-        new_learn_langs = new_profile['learn_langs']
-        new_learn_languageitem_list = []
-        for language in new_learn_langs:
-            new_language_item = LanguageItem()
-            new_language_item.language_id = language['language_id']
-            new_language_item.level = int(language['level'])
-            new_learn_languageitem_list.append(new_language_item)
-        user.learn_langs = new_learn_languageitem_list
+        new_learn_langs = new_profile.get('learn_langs')
+        if new_learn_langs is not None:
+            new_learn_languageitem_list = []
+            for language in new_learn_langs:
+                new_language_item = LanguageItem()
+                new_language_item.language_id = language['language_id']
+                new_language_item.level = int(language['level'])
+                new_learn_languageitem_list.append(new_language_item)
+            user.learn_langs = new_learn_languageitem_list
 
         # update location
-        if user.location is None:
-            user.location = Location()
-        user.location.type = new_profile['location']['type']
-        user.location.coordinates = [float(x) for x in new_profile['location']['coordinates']]
+        if new_profile.get('location') is not None:
+            if user.location is None:
+                user.location = Location()
+            user.location.type = new_profile['location']['type']
+            user.location.coordinates = [float(x) for x in new_profile['location']['coordinates']]
 
-        user.birthday = dateformat.timestamp_to_datetime(new_profile['birthday']) # update birthday
-        user.gender = new_profile['gender']             # update gender
-        user.nationality = new_profile['nationality']   # update nationality
+        # update birthday
+        if new_profile.get('birthday') is not None:
+            user.birthday = dateformat.timestamp_to_datetime(new_profile['birthday'])
+        # update gender
+        user.gender = new_profile['gender'] if new_profile.get('gender') is not None else user.gender
+        # update nationality
+        user.nationality = new_profile['nationality'] if new_profile.get('nationality') is not None else user.nationality
+
+        # update settings
+        if new_profile.get('settings') is not None:
+            new_settings = new_profile['settings']
+
+            user.settings.strict_lang_match = bool(new_settings['strict_lang_match']) \
+                if new_settings.get('strict_lang_match') is not None else user.settings.strict_lang_match
+            user.settings.same_gender = bool(new_settings['same_gender']) \
+                if new_settings.get('same_gender') is not None else user.settings.same_gender
+            user.settings.age_range = [int(x) for x in new_settings['age_range']] \
+                if new_settings.get('age_range') is not None else user.settings.age_range
+            user.settings.hide_from_nearby = bool(new_settings['hide_from_nearby']) \
+                if new_settings.get('hide_from_nearby') is not None else user.settings.hide_from_nearby
+            user.settings.hide_from_search = bool(new_settings['hide_from_search']) \
+                if new_settings.get('hide_from_search') is not None else user.settings.hide_from_search
+            user.settings.hide_info_fields = new_settings['hide_info_fields'] if new_settings.get('hide_info_fields') \
+                is not None else user.settings.hide_info_fields
+            user.settings.partner_confirmation = bool(new_settings['partner_confirmation']) \
+                if new_settings.get('partner_confirmation') is not None else user.settings.partner_confirmation
+
+        # update learn_points
+        if new_profile.get('learn_points') is not None:
+            new_learn_points = new_profile['learn_points']
+
+            user.learn_points.favorites = int(new_learn_points['favorites'])\
+                if new_learn_points.get('favorites') is not None else user.learn_points.favorites
+            user.learn_points.pronunciations = int(new_learn_points['pronunciations'])\
+                if new_learn_points.get('pronunciations') is not None else user.learn_points.pronunciations
+            user.learn_points.translations = int(new_learn_points['translations'])\
+                if new_learn_points.get('translations') is not None else user.learn_points.translations
+            user.learn_points.transliterations = int(new_learn_points['transliterations'])\
+                if new_learn_points.get('transliterations') is not None else user.learn_points.transliterations
+            user.learn_points.corrections = int(new_learn_points['corrections'])\
+                if new_learn_points.get('corrections') is not None else user.learn_points.corrections
+            user.learn_points.transcriptions = int(new_learn_points['transcriptions'])\
+                if new_learn_points.get('transcriptions') is not None else user.learn_points.transcriptions
+
 
         try:
             user.save()
