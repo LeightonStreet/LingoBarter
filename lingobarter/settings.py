@@ -32,6 +32,7 @@ PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
 # If you need different folder to save media files
 MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'mediafiles')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 ROOT_DIR = os.path.abspath(os.path.join(PROJECT_ROOT, '..'))

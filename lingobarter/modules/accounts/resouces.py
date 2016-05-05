@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import request
+import os
+from werkzeug.datastructures import FileStorage
+from werkzeug.utils import secure_filename
+from flask import request, current_app
 from flask_restful import Resource, reqparse, fields
 from flask_security import utils, auth_token_required
 from flask.ext.security.registerable import register_user
@@ -39,6 +42,10 @@ updateProfileParse.add_argument('location', type=dict, help='invalid location') 
 updateProfileParse.add_argument('birthday', type=fields.datetime, help='invalid birthday') #todo
 updateProfileParse.add_argument('gender', type=str, help='invalid gender')
 updateProfileParse.add_argument('nationality', type=str, help='invalid nationality')
+
+uploadAvatarParse = reqparse.RequestParser()
+uploadAvatarParse.add_argument('image', required=True, type=FileStorage, location='files')
+
 
 class LoginResource(Resource):
     def post(self):
@@ -260,3 +267,18 @@ class UserViewResource(Resource):
                     if 'current_login_at' not in invisible_fields else None
             }
         )
+
+
+class UploadAvatar(Resource):
+    def put(self):
+        def allowed_file(name):
+            return '.' in name and \
+                   name.rsplit('.', 1)[1] in current_app.config['ALLOWED_EXTENSIONS']
+        args = uploadAvatarParse.parse_args()
+        f = args['image']
+        print type(f)
+        if f and allowed_file(f.filename):
+            filename = secure_filename(f.filename)
+            f.save(os.path.join(current_app.config['MEDIA_ROOT'], filename))
+            return render_json(message='hello', status=200)
+        return render_json(message='hello', status=400)
