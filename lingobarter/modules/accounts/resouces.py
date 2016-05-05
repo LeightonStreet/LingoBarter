@@ -1,21 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import errno
+import json
+
 import os
-from werkzeug.datastructures import FileStorage
-from werkzeug.utils import secure_filename
+from bson import json_util
 from flask import request, current_app
+from flask.ext.security.registerable import register_user
 from flask_restful import Resource, reqparse, fields
 from flask_security import utils, auth_token_required
-from flask.ext.security.registerable import register_user
 from lingobarter.core.json import render_json
-from lingobarter.utils import get_current_user, dateformat
-from .models import User
-from bson import json_util
-import json
-import datetime
-import pytz
 from lingobarter.modules.accounts.models import Location, LanguageItem
+from lingobarter.utils import get_current_user, dateformat
+from werkzeug.datastructures import FileStorage
+from werkzeug.utils import secure_filename
+from .models import User
 
 """
 Parsers
@@ -36,10 +36,10 @@ updateProfileParse = reqparse.RequestParser()
 updateProfileParse.add_argument('name', type=str, help='invalid name')
 updateProfileParse.add_argument('tagline', type=str, help='invalid tagline')
 updateProfileParse.add_argument('bio', type=str, help='invalid bio')
-updateProfileParse.add_argument('teach_langs', type=list, help='invalid teach_langs') # todo
-updateProfileParse.add_argument('learn_langs', type=list, help='invalid learn_langs') # todo
-updateProfileParse.add_argument('location', type=dict, help='invalid location') #todo
-updateProfileParse.add_argument('birthday', type=fields.datetime, help='invalid birthday') #todo
+updateProfileParse.add_argument('teach_langs', type=list, help='invalid teach_langs')  # todo
+updateProfileParse.add_argument('learn_langs', type=list, help='invalid learn_langs')  # todo
+updateProfileParse.add_argument('location', type=dict, help='invalid location')  # todo
+updateProfileParse.add_argument('birthday', type=fields.datetime, help='invalid birthday')  # todo
 updateProfileParse.add_argument('gender', type=str, help='invalid gender')
 updateProfileParse.add_argument('nationality', type=str, help='invalid nationality')
 
@@ -73,6 +73,7 @@ class LogoutResource(Resource):
     """
     Log out
     """
+
     @auth_token_required
     def get(self):
         utils.logout_user()
@@ -83,6 +84,7 @@ class UserResource(Resource):
     """
     Sign up
     """
+
     def post(self):
         # parse arguments
         args = signupParser.parse_args()
@@ -101,11 +103,11 @@ class UserResource(Resource):
         return render_json(message='User has been created. You need to confirm the email to log in', status=200,
                            email=user.email)
 
-    """
-    User view him/her own profile
-    """
     @auth_token_required
     def get(self):
+        """
+        User view him/her own profile
+        """
         user = get_current_user()
         teach_languages = []
         learn_languages = []
@@ -135,7 +137,7 @@ class UserResource(Resource):
                 'teach_langs': teach_languages,
                 'learn_langs': learn_languages,
                 'location': None if user.location is None
-                    else {'type': user.location.type, 'coordinates': user.location.coordinates},
+                else {'type': user.location.type, 'coordinates': user.location.coordinates},
                 'birthday': dateformat.datetime_to_timestamp(user.birthday),
                 'gender': user.gender,
                 'settings': user.settings.to_mongo(),
@@ -144,12 +146,13 @@ class UserResource(Resource):
             }
         )
 
-    """
-    User configure & update himself/ herself's profile
-    Note: User can never update email or username
-    """
     @auth_token_required
     def put(self):
+        """
+        User configure & update himself/ herself's profile
+        Note: User can never update email or username
+        """
+
         # get current user
         user = get_current_user()
 
@@ -157,9 +160,10 @@ class UserResource(Resource):
         new_profile = json.loads(request.data, object_hook=json_util.object_hook)
 
         # parse new profile
-        user.name = new_profile['name'] if new_profile.get('name') is not None else user.name             # update name
-        user.tagline = new_profile['tagline'] if new_profile.get('tagline') is not None else user.tagline # update tagline
-        user.bio = new_profile['bio'] if new_profile.get('bio') is not None else user.bio                 # update bio
+        user.name = new_profile['name'] if new_profile.get('name') is not None else user.name  # update name
+        user.tagline = new_profile['tagline'] if new_profile.get(
+            'tagline') is not None else user.tagline  # update tagline
+        user.bio = new_profile['bio'] if new_profile.get('bio') is not None else user.bio  # update bio
 
         # update teach_langs
         new_teach_langs = new_profile.get('teach_langs')
@@ -196,7 +200,8 @@ class UserResource(Resource):
         # update gender
         user.gender = new_profile['gender'] if new_profile.get('gender') is not None else user.gender
         # update nationality
-        user.nationality = new_profile['nationality'] if new_profile.get('nationality') is not None else user.nationality
+        user.nationality = new_profile['nationality'] if new_profile.get(
+            'nationality') is not None else user.nationality
 
         # update settings
         if new_profile.get('settings') is not None:
@@ -213,7 +218,7 @@ class UserResource(Resource):
             user.settings.hide_from_search = bool(new_settings['hide_from_search']) \
                 if new_settings.get('hide_from_search') is not None else user.settings.hide_from_search
             user.settings.hide_info_fields = new_settings['hide_info_fields'] if new_settings.get('hide_info_fields') \
-                is not None else user.settings.hide_info_fields
+                                                                                 is not None else user.settings.hide_info_fields
             user.settings.partner_confirmation = bool(new_settings['partner_confirmation']) \
                 if new_settings.get('partner_confirmation') is not None else user.settings.partner_confirmation
 
@@ -221,19 +226,18 @@ class UserResource(Resource):
         if new_profile.get('learn_points') is not None:
             new_learn_points = new_profile['learn_points']
 
-            user.learn_points.favorites = int(new_learn_points['favorites'])\
+            user.learn_points.favorites = int(new_learn_points['favorites']) \
                 if new_learn_points.get('favorites') is not None else user.learn_points.favorites
-            user.learn_points.pronunciations = int(new_learn_points['pronunciations'])\
+            user.learn_points.pronunciations = int(new_learn_points['pronunciations']) \
                 if new_learn_points.get('pronunciations') is not None else user.learn_points.pronunciations
-            user.learn_points.translations = int(new_learn_points['translations'])\
+            user.learn_points.translations = int(new_learn_points['translations']) \
                 if new_learn_points.get('translations') is not None else user.learn_points.translations
-            user.learn_points.transliterations = int(new_learn_points['transliterations'])\
+            user.learn_points.transliterations = int(new_learn_points['transliterations']) \
                 if new_learn_points.get('transliterations') is not None else user.learn_points.transliterations
-            user.learn_points.corrections = int(new_learn_points['corrections'])\
+            user.learn_points.corrections = int(new_learn_points['corrections']) \
                 if new_learn_points.get('corrections') is not None else user.learn_points.corrections
-            user.learn_points.transcriptions = int(new_learn_points['transcriptions'])\
+            user.learn_points.transcriptions = int(new_learn_points['transcriptions']) \
                 if new_learn_points.get('transcriptions') is not None else user.learn_points.transcriptions
-
 
         try:
             user.save()
@@ -241,14 +245,11 @@ class UserResource(Resource):
         except Exception as err:
             return render_json(message=err.message, status=502)
 
-
-
-
-    """
-    User delete his/her own account
-    """
     @auth_token_required
     def delete(self):
+        """
+        User delete his/her own account
+        """
         pass
 
 
@@ -257,11 +258,12 @@ class UserViewResource(Resource):
     User profile view
     """
 
-    """
-    User view other user's profile
-    """
     @auth_token_required
     def get(self, username):
+        """
+        User view other user's profile
+        :param username: username
+        """
         user = User.get_user_by_username(username)
 
         if user is None:
@@ -302,27 +304,43 @@ class UserViewResource(Resource):
                 'teach_langs': teach_languages,
                 'learn_langs': learn_languages,
                 'location': {'type': user.location.type, 'coordinates': user.location.coordinates}
-                    if user.location and 'location' not in invisible_fields else None,
+                if user.location and 'location' not in invisible_fields else None,
                 'birthday': dateformat.datetime_to_timestamp(user.birthday)
-                    if 'birthday' not in invisible_fields else None,
+                if 'birthday' not in invisible_fields else None,
                 'gender': user.gender if 'gender' not in invisible_fields else None,
                 'nationality': user.nationality if 'nationality' not in invisible_fields else None,
                 'current_login_at': dateformat.datetime_to_timestamp(user.current_login_at)
-                    if 'current_login_at' not in invisible_fields else None
+                if 'current_login_at' not in invisible_fields else None
             }
         )
 
 
 class UploadAvatar(Resource):
+    """
+    Upload avatar
+    """
+
+    @auth_token_required
     def put(self):
         def allowed_file(name):
             return '.' in name and \
                    name.rsplit('.', 1)[1] in current_app.config['ALLOWED_EXTENSIONS']
+
+        # get current user
+        user = get_current_user()
+
         args = uploadAvatarParse.parse_args()
         f = args['image']
         print type(f)
         if f and allowed_file(f.filename):
             filename = secure_filename(f.filename)
-            f.save(os.path.join(current_app.config['MEDIA_ROOT'], filename))
-            return render_json(message='hello', status=200)
+            abs_name = os.path.join(current_app.config['MEDIA_ROOT'], user.username, filename)
+            if not os.path.exists(os.path.dirname(abs_name)):
+                try:
+                    os.makedirs(os.path.dirname(abs_name))
+                except OSError as exc:  # Guard against race condition
+                    if exc.errno != errno.EEXIST:
+                        return render_json(message=exc.message, status=502)
+            f.save(abs_name)
+            return render_json(message='File is saved successfully', status=200)
         return render_json(message='hello', status=400)
