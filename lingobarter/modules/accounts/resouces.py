@@ -150,39 +150,46 @@ class UserResource(Resource):
         new_profile = json.loads(request.data, object_hook=json_util.object_hook)
 
         # parse new profile
-        user.name = new_profile['name']                 # update name
-        user.tagline = new_profile['tagline']           # update tagline
-        user.bio = new_profile['bio']                   # update bio
+        user.name = new_profile['name'] if new_profile.get('name') is not None else user.name             # update name
+        user.tagline = new_profile['tagline'] if new_profile.get('tagline') is not None else user.tagline # update tagline
+        user.bio = new_profile['bio'] if new_profile.get('bio') is not None else user.bio                 # update bio
 
         # update teach_langs
-        new_teach_langs = new_profile['teach_langs']
-        new_teach_languageitem_list = []
-        for language in new_teach_langs:
-            new_language_item = LanguageItem()
-            new_language_item.language_id = language['language_id']
-            new_language_item.level = int(language['level'])
-            new_teach_languageitem_list.append(new_language_item)
-        user.teach_langs = new_teach_languageitem_list
+        new_teach_langs = new_profile.get('teach_langs')
+        if new_teach_langs is not None:
+            new_teach_languageitem_list = []
+            for language in new_teach_langs:
+                new_language_item = LanguageItem()
+                new_language_item.language_id = language['language_id']
+                new_language_item.level = int(language['level'])
+                new_teach_languageitem_list.append(new_language_item)
+            user.teach_langs = new_teach_languageitem_list
 
         # update learn_langs
-        new_learn_langs = new_profile['learn_langs']
-        new_learn_languageitem_list = []
-        for language in new_learn_langs:
-            new_language_item = LanguageItem()
-            new_language_item.language_id = language['language_id']
-            new_language_item.level = int(language['level'])
-            new_learn_languageitem_list.append(new_language_item)
-        user.learn_langs = new_learn_languageitem_list
+        new_learn_langs = new_profile.get('learn_langs')
+        if new_learn_langs is not None:
+            new_learn_languageitem_list = []
+            for language in new_learn_langs:
+                new_language_item = LanguageItem()
+                new_language_item.language_id = language['language_id']
+                new_language_item.level = int(language['level'])
+                new_learn_languageitem_list.append(new_language_item)
+            user.learn_langs = new_learn_languageitem_list
 
         # update location
-        if user.location is None:
-            user.location = Location()
-        user.location.type = new_profile['location']['type']
-        user.location.coordinates = [float(x) for x in new_profile['location']['coordinates']]
+        if new_profile.get('location') is not None:
+            if user.location is None:
+                user.location = Location()
+            user.location.type = new_profile['location']['type']
+            user.location.coordinates = [float(x) for x in new_profile['location']['coordinates']]
 
-        user.birthday = dateformat.timestamp_to_datetime(new_profile['birthday']) # update birthday
-        user.gender = new_profile['gender']             # update gender
-        user.nationality = new_profile['nationality']   # update nationality
+        # update birthday
+        if new_profile.get('birthday') is not None:
+            user.birthday = dateformat.timestamp_to_datetime(new_profile['birthday'])
+        # update gender
+        user.gender = new_profile['gender'] if new_profile.get('gender') is not None else user.gender
+        # update nationality
+        user.nationality = new_profile['nationality'] if new_profile.get('nationality') is not None else user.nationality
 
         try:
             user.save()
