@@ -191,6 +191,43 @@ class UserResource(Resource):
         # update nationality
         user.nationality = new_profile['nationality'] if new_profile.get('nationality') is not None else user.nationality
 
+        # update settings
+        if new_profile.get('settings') is not None:
+            new_settings = new_profile['settings']
+
+            user.settings.strict_lang_match = bool(new_settings['strict_lang_match']) \
+                if new_settings.get('strict_lang_match') is not None else user.settings.strict_lang_match
+            user.settings.same_gender = bool(new_settings['same_gender']) \
+                if new_settings.get('same_gender') is not None else user.settings.same_gender
+            user.settings.age_range = [int(x) for x in new_settings['age_range']] \
+                if new_settings.get('age_range') is not None else user.settings.age_range
+            user.settings.hide_from_nearby = bool(new_settings['hide_from_nearby']) \
+                if new_settings.get('hide_from_nearby') is not None else user.settings.hide_from_nearby
+            user.settings.hide_from_search = bool(new_settings['hide_from_search']) \
+                if new_settings.get('hide_from_search') is not None else user.settings.hide_from_search
+            user.settings.hide_info_fields = new_settings['hide_info_fields'] if new_settings.get('hide_info_fields') \
+                is not None else user.settings.hide_info_fields
+            user.settings.partner_confirmation = bool(new_settings['partner_confirmation']) \
+                if new_settings.get('partner_confirmation') is not None else user.settings.partner_confirmation
+
+        # update learn_points
+        if new_profile.get('learn_points') is not None:
+            new_learn_points = new_profile['learn_points']
+
+            user.learn_points.favorites = int(new_learn_points['favorites'])\
+                if new_learn_points.get('favorites') is not None else user.learn_points.favorites
+            user.learn_points.pronunciations = int(new_learn_points['pronunciations'])\
+                if new_learn_points.get('pronunciations') is not None else user.learn_points.pronunciations
+            user.learn_points.translations = int(new_learn_points['translations'])\
+                if new_learn_points.get('translations') is not None else user.learn_points.translations
+            user.learn_points.transliterations = int(new_learn_points['transliterations'])\
+                if new_learn_points.get('transliterations') is not None else user.learn_points.transliterations
+            user.learn_points.corrections = int(new_learn_points['corrections'])\
+                if new_learn_points.get('corrections') is not None else user.learn_points.corrections
+            user.learn_points.transcriptions = int(new_learn_points['transcriptions'])\
+                if new_learn_points.get('transcriptions') is not None else user.learn_points.transcriptions
+
+
         try:
             user.save()
             return render_json(message='Successfully updated user profile', status=200)
