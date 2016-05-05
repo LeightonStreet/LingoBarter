@@ -11,11 +11,10 @@ from flask.ext.security.registerable import register_user
 from flask_restful import Resource, reqparse, fields
 from flask_security import utils, auth_token_required
 from lingobarter.core.json import render_json
-from lingobarter.modules.accounts.models import Location, LanguageItem
 from lingobarter.utils import get_current_user, dateformat
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
-from .models import User
+from .models import User, Location, LanguageItem
 
 """
 Parsers
