@@ -60,18 +60,20 @@ class SearchResource(Resource):
         if filter_data.get('nationality') is not None:
             filter_conditions['nationality'] = filter_data['nationality']
         if filter_data.get('teach_langs') is not None:
-            filter_conditions['teach_langs'] = []
+            filter_conditions['teach_langs_id_list'] = []
             for language in filter_data['teach_langs']:
-                new_language_item = LanguageItem()
-                new_language_item.language_id = language['language_id']
-                filter_conditions['teach_langs'].append(new_language_item)
+                filter_conditions['teach_langs_id_list'].append(language['language_id'])
+
         if filter_data.get('learn_langs') is not None:
-            filter_conditions['learn_langs'] = []
+            filter_conditions['learn_langs_id_list'] = []
+            filter_conditions['learn_langs_level_list'] = []
             for language in filter_data['learn_langs']:
-                new_language_item = LanguageItem()
-                new_language_item.language_id = language['language_id']
-                new_language_item.level = int(language['level']) if language.get('level') is not None else 0
-                filter_conditions['learn_langs'].append(new_language_item)
+                filter_conditions['learn_langs_id_list'].append(language['language_id'])
+                if language.get('level') is not None:
+                    filter_conditions['learn_langs_level_list'].append([int(level) for level in language['level']])
+                else:
+                    filter_conditions['learn_langs_level_list'].append([0, 5]) # set to default value
+
         if filter_data.get('has_bio') is not None:
             if bool(filter_data['has_bio']): # if True, update filter condition
                 filter_conditions['has_bio'] = True
@@ -115,23 +117,26 @@ class SearchResource(Resource):
             query_filter.append({'nationality': {'$in': filter_conditions['nationality']}})
 
         # teach_langs
-        if filter_conditions.get('teach_langs') is not None:
-            teach_language_id_list = [language.language_id for language in filter_conditions['teach_langs']]
-            teach_langs_query_filter = {'teach_langs.language_id': {'$in': teach_language_id_list}}
+        if filter_conditions.get('teach_langs_id_list') is not None:
+            teach_langs_query_filter = {'teach_langs.language_id': {'$in': filter_conditions['teach_langs_id_list']}}
 
         # learn_langs
-        if filter_conditions.get('learn_langs') is not None:
+        if filter_conditions.get('learn_langs_id_list') is not None:
             learn_langs_query_filter_list = []
-            for language in filter_conditions['learn_langs']:
+            for i in range(len(filter_conditions['learn_langs_id_list'])):
                 learn_langs_query_filter_list.append(
                     {'learn_langs':{
                         '$elemMatch': {
-                            'language_id': {'$eq': language.language_id},
-                            'level': {'$gte': language.level}
+                            'language_id': {'$eq': filter_conditions['learn_langs_id_list'][i]},
+                            '$and': [
+                                {'level': {'$gte': filter_conditions['learn_langs_level_list'][i][0]}},
+                                {'level': {'$lte': filter_conditions['learn_langs_level_list'][i][1]}}
+                            ]
                         }
                     }
                     }
                 )
+
             learn_language_query_filter = {'$or': learn_langs_query_filter_list}
 
             language_query_filter = {'$and': [teach_langs_query_filter, learn_language_query_filter]}
