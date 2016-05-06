@@ -3,7 +3,8 @@ from lingobarter.core.app import LingobarterModule
 from lingobarter.core.api import LingobarterApi
 from .views import ProfileEditView, ProfileView
 from .resouces import (LoginResource, LogoutResource, UserViewResource,
-                       UserResource, UploadAvatar)
+                       UserResource, UploadAvatar, PasswordResource,
+                       PasswordResetResource, UsernameResource, ConfirmationRequestResource)
 
 # create our module based on blueprint
 module = LingobarterModule('accounts', __name__, template_folder='templates')
@@ -22,3 +23,8 @@ api_v1.add_lingobarter_resource(LogoutResource, '/accounts/unauthorize')
 api_v1.add_lingobarter_resource(UserResource, '/users')
 api_v1.add_lingobarter_resource(UserViewResource, '/users/<username>')
 api_v1.add_lingobarter_resource(UploadAvatar, '/users/upload')
+
+api_v1.add_lingobarter_resource(PasswordResource, '/accounts/password')
+api_v1.add_lingobarter_resource(PasswordResetResource, '/accounts/password/reset')
+api_v1.add_lingobarter_resource(UsernameResource, '/accounts/username')
+api_v1.add_lingobarter_resource(ConfirmationRequestResource, '/accounts/confirm')
