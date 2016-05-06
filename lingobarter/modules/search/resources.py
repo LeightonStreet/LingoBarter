@@ -79,26 +79,52 @@ class SearchResource(Resource):
                 filter_conditions['has_bio'] = True
 
         # generate query filter
+        # age_range
         query_filter = []
-        # if filter_conditions.get('age_range') is not None:
-        #     least_birthday = datetime.datetime.now() - relativedelta(years=filter_conditions['age_range'][1])
-        #     most_birthday = datetime.datetime.now() - relativedelta(years=filter_conditions['age_range'][0])
-        #     query_filter.append({'birthday': {'$gte': least_birthday}})
-        #     query_filter.append({'birthday': {'$lte': most_birthday}})
-        # if filter_conditions.get('nationality') is not None:
-        #     query_filter.append({'nationality': {'$in': filter_conditions['nationality']}})
-        if filter_conditions.get('teach_langs') is not None:
-            # query_filter.append({'teach_langs.language_id': {'$in': filter_conditions['teach_langs']['language_id']}})
-            pass
-        if filter_conditions.get('learn_langs') is not None:
-            pass
-        if filter_conditions.get('has_bio') is not None:
-            pass
+        if filter_conditions.get('age_range') is not None:
+            least_birthday = datetime.datetime.now() - relativedelta(years=filter_conditions['age_range'][1])
+            most_birthday = datetime.datetime.now() - relativedelta(years=filter_conditions['age_range'][0])
+            query_filter.append({'birthday': {'$gte': least_birthday}})
+            query_filter.append({'birthday': {'$lte': most_birthday}})
 
+        # nationality
+        if filter_conditions.get('nationality') is not None:
+            query_filter.append({'nationality': {'$in': filter_conditions['nationality']}})
+
+        # teach_langs
+        if filter_conditions.get('teach_langs') is not None:
+            teach_language_id_list = [language.language_id for language in filter_conditions['teach_langs']]
+            query_filter.append({'teach_langs.language_id': {'$in': teach_language_id_list}})
+
+        # learn_langs
+        if filter_conditions.get('learn_langs') is not None:
+            learn_langs_query_filter = []
+            for language in filter_conditions['learn_langs']:
+                learn_langs_query_filter.append(
+                    {'learn_langs':{
+                        '$elemMatch': {
+                            'language_id': {'$eq': language.language_id},
+                            'level': {'$gte': language.level}
+                        }
+                    }
+                    }
+                )
+            query_filter.append({'$or': learn_langs_query_filter})
+
+        # has_bio
+        if filter_conditions.get('has_bio') is not None:
+            query_filter.append({'bio': {'$exists': True}})
+
+        # we also need to filter out the user himself
         query_filter.append({'username': {'$ne': user.username}})
+
+        # combine all query condition filters
         query = {'$and': query_filter}
+
+        # query
         acceptable_users = User.objects(__raw__=query)
 
+        # print result
         print "*********************"
         for x in acceptable_users:
             print x.email
