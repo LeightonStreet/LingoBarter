@@ -78,53 +78,30 @@ class SearchResource(Resource):
             if bool(filter_data['has_bio']): # if True, update filter condition
                 filter_conditions['has_bio'] = True
 
-        # query = {'bio': { $exists: True}}
-        query = {'email': 'coco.xin.yang2013@gmail.com'}
-        acceptable_users = User.objects(__raw__=query)
+        # generate query filter
+        query_filter = []
+        # if filter_conditions.get('age_range') is not None:
+        #     least_birthday = datetime.datetime.now() - relativedelta(years=filter_conditions['age_range'][1])
+        #     most_birthday = datetime.datetime.now() - relativedelta(years=filter_conditions['age_range'][0])
+        #     query_filter.append({'birthday': {'$gte': least_birthday}})
+        #     query_filter.append({'birthday': {'$lte': most_birthday}})
+        # if filter_conditions.get('nationality') is not None:
+        #     query_filter.append({'nationality': {'$in': filter_conditions['nationality']}})
+        if filter_conditions.get('teach_langs') is not None:
+            # query_filter.append({'teach_langs.language_id': {'$in': filter_conditions['teach_langs']['language_id']}})
+            pass
+        if filter_conditions.get('learn_langs') is not None:
+            pass
+        if filter_conditions.get('has_bio') is not None:
+            pass
 
+        query_filter.append({'username': {'$ne': user.username}})
+        query = {'$and': query_filter}
+        acceptable_users = User.objects(__raw__=query)
 
         print "*********************"
         for x in acceptable_users:
             print x.email
-
-        # # generate filters according to filter_conditions
-        # filters = Q()
-        # # if filter_conditions.get('age_range') is not None:
-        # #     least_birthday = datetime.datetime.now() - relativedelta(years=filter_conditions['age_range'][1])
-        # #     most_birthday = datetime.datetime.now() - relativedelta(years=filter_conditions['age_range'][0])
-        # #     filters = filters & Q(birthday__gte=least_birthday) & Q(birthday__lte=most_birthday)
-        # #     filters = filters & Q(birthday__gte=least_birthday) & Q(birthday__lte=most_birthday)
-        # # if filter_conditions.get('nationality') is not None:
-        # #     filters = filters & Q(nationality__in=filter_conditions['nationality'])
-        # # if filter_conditions.get('teach_langs') is not None:
-        # #     teach_langs_filters = Q()
-        # #     for language in filter_conditions['teach_langs']:
-        # #         teach_langs_filters = (teach_langs_filters | Q(teach_langs__language_id=language.language_id))
-        # #     filters = filters & (teach_langs_filters)
-        # if filter_conditions.get('learn_langs') is not None:
-        #     learn_langs_filters = Q()
-        #     for language in filter_conditions['learn_langs']:
-        #         learn_langs_filters = (learn_langs_filters |
-        #                                Q(language.language_id in User.get_learn_language_id_gte_level(language.level)))
-        #     filters = filters & (learn_langs_filters)
-        # # if filter_conditions.get('has_bio') is not None:
-        # #     filters = filters & Q(bio__ne=None)
-        #
-        #
-        # # Also, result should not include the user himself
-        # filters = filters & Q(username__ne=user.username)
-        # # search
-        # acceptable_users = User.objects(filters)
-        #
-        # print "*********************"
-        # for x in acceptable_users:
-        #     print x.email
-        #     print x.birthday, '\n'
-        #     for lan in x.learn_langs:
-        #         print lan
-
-
-
 
         return render_json(message='Successfully search users.', status=200)
 
