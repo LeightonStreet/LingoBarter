@@ -75,6 +75,10 @@ class SearchResource(Resource):
             if bool(filter_data['has_bio']):  # if True, update filter condition
                 filter_conditions['has_bio'] = True
 
+        filter_conditions['page_id'] = filter_data['page_id'] if filter_data.get('page_id') is not None else 0
+
+        filter_conditions['page_size'] = filter_data['page_size'] if filter_data.get('page_size') is not None else 20
+
         # generate query filter
         # age_range
         query_filter = []
@@ -168,7 +172,11 @@ class SearchResource(Resource):
         query = {'$and': query_filter}
 
         # query
-        acceptable_users = User.objects(__raw__=query)
+        start_record_num = filter_conditions['page_id'] * filter_conditions['page_size']
+        end_record_num = start_record_num + filter_conditions['page_size']
+        acceptable_users = User.objects(__raw__=query)[start_record_num: end_record_num]
+        print start_record_num, end_record_num
+        print type(acceptable_users)
 
         # get acceptable users' profiles
         acceptable_users_profiles = []
