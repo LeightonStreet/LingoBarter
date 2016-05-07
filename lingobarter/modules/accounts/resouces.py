@@ -279,7 +279,7 @@ class UserViewResource(Resource):
             return render_json(
                 message='View ' + username + "'s profile",
                 status=200,
-                response=profile
+                **profile
             )
 
 
@@ -357,20 +357,34 @@ class PasswordResource(Resource):
 
 
 class PasswordResetResource(Resource):
-    @auth_token_required
-    def get(self):
+    def post(self):
         if not current_app.config['SECURITY_RECOVERABLE']:
             return render_json(message='Security configuration does not allow this operation', status=403)
-        user = get_current_user()
+        parser = reqparse.RequestParser()
+        parser.add_argument('email', type=str, required=True)
+
+        args = parser.parse_args()
+        user = User.get_user(args['email'])
+
+        if not user:
+            return render_json(message={'email': 'User does not exist'}, status=404)
+
         send_reset_password_instructions(user)
         return render_json(message='Successfully send password reset instruction', status=200)
 
 
 class ConfirmationRequestResource(Resource):
-    @auth_token_required
-    def get(self):
+    def post(self):
         if not current_app.config['SECURITY_CONFIRMABLE']:
             return render_json(message='Security configuration does not allow this operation', status=403)
-        user = get_current_user()
+        parser = reqparse.RequestParser()
+        parser.add_argument('email', type=str, required=True)
+
+        args = parser.parse_args()
+        user = User.get_user(args['email'])
+
+        if not user:
+            return render_json(message={'email': 'User does not exist'}, status=404)
+
         send_confirmation_instructions(user)
         return render_json(message='Successfully send confirmation instruction', status=200)
