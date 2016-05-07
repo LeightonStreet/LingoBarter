@@ -175,8 +175,6 @@ class SearchResource(Resource):
         start_record_num = filter_conditions['page_id'] * filter_conditions['page_size']
         end_record_num = start_record_num + filter_conditions['page_size']
         acceptable_users = User.objects(__raw__=query)[start_record_num: end_record_num]
-        print start_record_num, end_record_num
-        print type(acceptable_users)
 
         # get acceptable users' profiles
         acceptable_users_profiles = []
