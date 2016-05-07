@@ -268,55 +268,19 @@ class UserViewResource(Resource):
         User view other user's profile
         :param username: username
         """
-        user = User.get_user_by_username(username)
+        profile = User.get_other_profile(username)
 
-        if user is None:
+        if profile is None:
             return render_json(
                 message={'username': username + ' does not exist'},
                 status=404
             )
-
-        teach_languages = []
-        learn_languages = []
-
-        for tech_language in user.teach_langs:
-            teach_languages.append({
-                'language_id': tech_language.language_id,
-                'level': tech_language.level
-            })
-
-        for learn_language in user.learn_langs:
-            learn_languages.append({
-                'language_id': learn_language.language_id,
-                'level': learn_language.level
-            })
-
-        # could be ['location', 'nationality', 'birthday', 'current_login_at', 'gender']
-        invisible_fields = user.settings.hide_info_fields
-
-        print type(user.current_login_at)
-
-        return render_json(
-            message='View ' + username + "'s profile",
-            status=200,
-            response={
-                'name': user.username if user.name is None else user.name,
-                'username': user.username,
-                'tagline': user.tagline,
-                'bio': user.bio,
-                'avatar_url': user.get_avatar_url() if user.avatar_file_path is not None else None,
-                'teach_langs': teach_languages,
-                'learn_langs': learn_languages,
-                'location': {'type': user.location.type, 'coordinates': user.location.coordinates}
-                if user.location and 'location' not in invisible_fields else None,
-                'birthday': dateformat.datetime_to_timestamp(user.birthday)
-                if 'birthday' not in invisible_fields else None,
-                'gender': user.gender if 'gender' not in invisible_fields else None,
-                'nationality': user.nationality if 'nationality' not in invisible_fields else None,
-                'current_login_at': dateformat.datetime_to_timestamp(user.current_login_at)
-                if 'current_login_at' not in invisible_fields else None
-            }
-        )
+        else:
+            return render_json(
+                message='View ' + username + "'s profile",
+                status=200,
+                response=profile
+            )
 
 
 class UploadAvatar(Resource):
