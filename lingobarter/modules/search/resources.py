@@ -3,18 +3,14 @@
 
 import json
 from bson import json_util
-
 from flask_restful import Resource
 from flask_security import auth_token_required
 from flask import request
-
 from lingobarter.utils import get_current_user
 from lingobarter.core.json import render_json
-from ..accounts.models import User, LanguageItem
-
+from ..accounts.models import User
 import datetime
 from dateutil.relativedelta import relativedelta
-
 
 # in database: teach_langs is what I want to teach , and learn_langs is what I want to learn
 
@@ -35,6 +31,7 @@ class SearchResource(Resource):
         #                                        default value of level is 0)
         # 'has_bio': bool, if true, only accept users who have bio in their profile
     """
+
     @auth_token_required
     def post(self):
         # get current user
@@ -72,10 +69,10 @@ class SearchResource(Resource):
                 if language.get('level') is not None:
                     filter_conditions['learn_langs_level_list'].append([int(level) for level in language['level']])
                 else:
-                    filter_conditions['learn_langs_level_list'].append([0, 5]) # set to default value
+                    filter_conditions['learn_langs_level_list'].append([0, 5])  # set to default value
 
         if filter_data.get('has_bio') is not None:
-            if bool(filter_data['has_bio']): # if True, update filter condition
+            if bool(filter_data['has_bio']):  # if True, update filter condition
                 filter_conditions['has_bio'] = True
 
         # generate query filter
@@ -88,7 +85,7 @@ class SearchResource(Resource):
 
         # here we consider settings of other usres:
         # can only be found by user within age range
-        now_date = datetime.datetime.now().date() # current date
+        now_date = datetime.datetime.now().date()  # current date
         age = relativedelta(now_date, user.birthday).years
         query_filter.append({'$and':
                                  [{'settings.age_range.0': {'$lte': age}},
@@ -99,12 +96,11 @@ class SearchResource(Resource):
         # can only be found by users with same gender
         query_filter.append({'$or': [
             {'settings.same_gender': {'$eq': False}},
-             {'$and': [
-                 {'settings.same_gender': {'$eq': True}},
-                 {'gender': {'$eq': user.gender}}]
-             }]
+            {'$and': [
+                {'settings.same_gender': {'$eq': True}},
+                {'gender': {'$eq': user.gender}}]
+            }]
         })
-
 
         if filter_conditions.get('age_range') is not None:
             least_birthday = datetime.datetime.now() - relativedelta(years=filter_conditions['age_range'][1])
@@ -125,7 +121,7 @@ class SearchResource(Resource):
             learn_langs_query_filter_list = []
             for i in range(len(filter_conditions['learn_langs_id_list'])):
                 learn_langs_query_filter_list.append(
-                    {'learn_langs':{
+                    {'learn_langs': {
                         '$elemMatch': {
                             'language_id': {'$eq': filter_conditions['learn_langs_id_list'][i]},
                             '$and': [
@@ -156,7 +152,7 @@ class SearchResource(Resource):
                     {'settings.strict_lang_match': {'$eq': False}},
                     {'$and': [
                         {'settings.strict_lang_match': {'$eq': True}},
-                         strict_lang_query_filter]
+                        strict_lang_query_filter]
                     }
                 ]
             })
@@ -174,22 +170,9 @@ class SearchResource(Resource):
         # query
         acceptable_users = User.objects(__raw__=query)
 
-        # print result
-        print "*********************"
-        for x in acceptable_users:
-            print x.email
+        # get acceptable users' profiles
+        acceptable_users_profiles = []
+        for acceptable_user in acceptable_users:
+            acceptable_users_profiles.append(User.get_other_profile(acceptable_user.username))
 
-        return render_json(message='Successfully search users.', status=200)
-
-
-
-
-
-
-
-
-
-
-
-
-
+        return render_json(message='Successfully search users.', status=200, response=acceptable_users_profiles)
