@@ -3,9 +3,9 @@
 import os
 from flask import send_from_directory, current_app, request
 from flask.ext.security import roles_accepted
-from lingobarter.core.views import (
-    ContentList,
-)
+from lingobarter.core.api import LingobarterApi
+from lingobarter.core.resources import LanguageResource
+from lingobarter.core.views import ContentList
 
 
 @roles_accepted('admin', 'developer')
@@ -24,6 +24,7 @@ def static_from_root():
 
 
 def configure(app):
+    # add url rule
     app.add_lingobarter_url_rule('/mediafiles/<path:filename>', view_func=media)
     app.add_lingobarter_url_rule('/template_files/<path:filename>',
                                  view_func=template_files)
@@ -35,3 +36,7 @@ def configure(app):
         '/',
         view_func=ContentList.as_view('home')
     )
+
+    # add restful rule
+    api = LingobarterApi(app, version='v1')
+    api.add_lingobarter_resource(LanguageResource, '/languages')

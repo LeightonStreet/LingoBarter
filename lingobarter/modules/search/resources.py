@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import datetime
 import json
+
 from bson import json_util
+from dateutil.relativedelta import relativedelta
+from flask import request
 from flask_restful import Resource
 from flask_security import auth_token_required
-from flask import request
-from lingobarter.utils import get_current_user
 from lingobarter.core.json import render_json
+from lingobarter.utils import get_current_user
 from ..accounts.models import User
-import datetime
-from dateutil.relativedelta import relativedelta
+
 
 # in database: teach_langs is what I want to teach , and learn_langs is what I want to learn
 
