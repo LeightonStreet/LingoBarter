@@ -10,6 +10,7 @@ from flask_gravatar import Gravatar
 from lingobarter.core.db import db
 from lingobarter.core.models.custom_values import HasCustomValue
 from lingobarter.utils.text import abbreviate, slugify
+from lingobarter.utils import dateformat
 
 logger = logging.getLogger()
 
@@ -257,6 +258,54 @@ class User(db.DynamicDocument, HasCustomValue, UserMixin):
     @classmethod
     def get_user_by_username(cls, username):
         return cls.objects(username=username).first()
+
+    """
+        get profile by username
+    """
+    @classmethod
+    def get_other_profile(cls, username):
+        user = User.get_user_by_username(username)
+
+        if user is None:
+            return None
+
+        teach_languages = []
+        learn_languages = []
+
+        for tech_language in user.teach_langs:
+            teach_languages.append({
+                'language_id': tech_language.language_id,
+                'level': tech_language.level
+            })
+
+        for learn_language in user.learn_langs:
+            learn_languages.append({
+                'language_id': learn_language.language_id,
+                'level': learn_language.level
+            })
+
+        # could be ['location', 'nationality', 'birthday', 'current_login_at', 'gender']
+        invisible_fields = user.settings.hide_info_fields
+
+        profile = {
+            'name': user.username if user.name is None else user.name,
+            'username': user.username,
+            'tagline': user.tagline,
+            'bio': user.bio,
+            'avatar_url': user.get_avatar_url() if user.avatar_file_path is not None else None,
+            'teach_langs': teach_languages,
+            'learn_langs': learn_languages,
+            'location': {'type': user.location.type, 'coordinates': user.location.coordinates}
+            if user.location and 'location' not in invisible_fields else None,
+            'birthday': dateformat.datetime_to_timestamp(user.birthday)
+            if 'birthday' not in invisible_fields else None,
+            'gender': user.gender if 'gender' not in invisible_fields else None,
+            'nationality': user.nationality if 'nationality' not in invisible_fields else None,
+            'current_login_at': dateformat.datetime_to_timestamp(user.current_login_at)
+            if 'current_login_at' not in invisible_fields else None
+        }
+
+        return profile
 
 
 class Connection(db.Document):
