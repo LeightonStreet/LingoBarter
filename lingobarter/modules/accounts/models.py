@@ -43,8 +43,8 @@ class UserLink(db.EmbeddedDocument):
 
 
 class LanguageItem(db.EmbeddedDocument):
-    language_id = db.StringField(max_length=10, required=True)
-    level = db.IntField(default=0, required=True)
+    language_id = db.StringField(max_length=50, required=True)
+    level = db.IntField(default=0)
 
     def __unicode__(self):
         return u"{0} - {1}".format(self.language_id, self.level)
@@ -168,6 +168,7 @@ class User(db.DynamicDocument, HasCustomValue, UserMixin):
     settings = db.EmbeddedDocumentField(UserSetting, default=UserSetting())
     learn_points = db.EmbeddedDocumentField(LearnPoint, default=LearnPoint())
     nationality = db.StringField()
+    partners = db.ListField(db.ObjectIdField(), default=[])
 
     def get_avatar_url(self, *args, **kwargs):
         if self.use_avatar_from == 'url':
@@ -328,10 +329,10 @@ class Connection(db.Document):
         return u"{0}".format(self.user_id)
 
 
-class Language(db.DynamicDocument, HasCustomValue):
+class Language(db.DynamicDocument):
     name = db.StringField(max_length=50, required=True, unique=True)
     u_name = db.StringField(max_length=100)
-    _id = db.StringField(max_length=10, required=True)
+    abbrev = db.StringField(max_length=10, required=True)
 
     def __unicode__(self):
         return u"{0} - {1} - {2}".format(self.name, self.u_name, self._id)

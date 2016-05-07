@@ -1,158 +1,195 @@
 {
-    "users": [
+  "users": [
+    {
+      "name": "user1",
+      "email": "lingobarter.user1@gmail.com",
+      "password": "user1lingobarter",
+      "roles": [
+        "user"
+      ],
+      "username": "user1",
+      "tagline": "You know what????!!!!",
+      "bio": "I do teach and learn",
+      "avatar_file_path": "default-avatar.png",
+      "teach_langs": [
         {
-            "name" : "admin",
-            "email" : "admin@example.com",
-            "gravatar_email": "jet.in.brain@gmail.com",
-            "password" : "admin",
-            "roles" : [ "admin" ],
-            "bio": "Lingobarter Example Admin",
-            "tagline": "Lingobarter is the best CMS!",
-            "links": [
-                {
-                    "title" : "facebook",
-                    "link" : "http://facebook.com/quokkaproject",
-                    "icon" : "facebook",
-                    "css_class" : "facebook",
-                    "order" : 0
-                },
-                {
-                    "title" : "github",
-                    "link" : "http://github.com/quokkaproject",
-                    "icon" : "github",
-                    "css_class" : "github",
-                    "order" : 0
-                },
-                {
-                    "title" : "twitter",
-                    "link" : "http://twitter.com/quokkaproject",
-                    "icon" : "twitter",
-                    "css_class" : "twitter",
-                    "order" : 0
-                }
-            ]
-        },
-        {
-            "name" : "author",
-            "email" : "author@example.com",
-            "gravatar_email": "jet.in.brain@gmail.com",
-            "password" : "author",
-            "roles" : [ "author" ],
-            "bio": "Lingobarter Example Author",
-            "tagline": "It is nice to write in Lingobarter CMS!",
-            "links": [
-                {
-                    "title" : "facebook",
-                    "link" : "http://facebook.com/quokkaproject",
-                    "icon" : "facebook",
-                    "css_class" : "facebook",
-                    "order" : 0
-                },
-                {
-                    "title" : "github",
-                    "link" : "http://github.com/quokkaproject",
-                    "icon" : "github",
-                    "css_class" : "github",
-                    "order" : 0
-                },
-                {
-                    "title" : "twitter",
-                    "link" : "http://twitter.com/quokkaproject",
-                    "icon" : "twitter",
-                    "css_class" : "twitter",
-                    "order" : 0
-                }
-            ]
+          "language_id": "English"
         }
-    ],
-    "configs": [
+      ],
+      "learn_langs": [
         {
-            "group": "site",
-            "description": "Preferences for website",
-            "values": [
-               {
-                   "name": "site_name",
-                   "rawvalue": "Lingobarter website",
-                   "formatter": "text"
-               },
-               {
-                   "name": "site_keywords",
-                   "rawvalue": "cms,lingobarter,flask,mongo,python",
-                   "formatter": "text"
-               },
-               {
-                   "name": "site_description",
-                   "rawvalue": "The Happiest CMS in the World",
-                   "formatter": "text"
-               },
-               {
-                   "name": "site_tagline",
-                   "rawvalue": "The Happiest CMS in the World",
-                   "formatter": "text"
-               },
-               {
-                   "name": "site_author",
-                   "rawvalue": "Bruno Rocha",
-                   "formatter": "text"
-               },
-               {
-                   "name": "site_logo",
-                   "rawvalue": "/static/img/logo_white.png",
-                   "formatter": "text"
-               },
-               {
-                   "name": "google-analytics",
-                   "rawvalue": "YOUR_APP_CODE_HERE",
-                   "formatter": "text"
-               },
-               {
-                   "name": "menu_items",
-                   "rawvalue":"[[\"Lingobarter\", \"http://www.lingobarter.org\"], [\"Slack Chat\", \"https://quokkaslack.herokuapp.com/\"]]",
-                   "formatter": "json"
-               },
-               {
-                   "name": "social_items",
-                   "rawvalue":"[[\"github\", \"http://github.com/lingobarter\"], [\"twitter\", \"https://twitter.com/lingobarter/\"]]",
-                   "formatter": "json"
-               }
-            ]
+          "language_id": "Chinese Simplified",
+          "level": 2
         },
         {
-            "group": "comments",
-            "description": "Comment system can be: internal or disqus requires_login: 0 or 1",
-            "values": [
-               {
-                   "name": "system",
-                   "rawvalue": "disqus",
-                   "formatter": "text"
-               },
-               {
-                   "name": "custom_script",
-                   "rawvalue": "",
-                   "formatter": "text"
-               },
-               {
-                   "name": "disqus_shortname",
-                   "rawvalue": "quokkaexample",
-                   "formatter": "text"
-               },
-               {
-                   "name": "requires_login",
-                   "rawvalue": "0",
-                   "formatter": "int"
-               }
-            ]
-        },
-        {
-            "group": "settings",
-            "description": "App settings override CAUTION!!!",
-            "values": [
-               {
-                   "name": "EXAMPLE",
-                   "rawvalue": "this_overwrite_the_value_in_settings",
-                   "formatter": "text"
-               }
-            ]
+          "language_id": "Cantonese",
+          "level": 3
         }
-    ]
+      ],
+      "location": {
+        "type": "Point",
+        "coordinates": [
+          121.6,
+          30.5
+        ]
+      },
+      "birthday": 1340942400.0,
+      "gender": "male",
+      "nationality": "USA",
+      "partners": []
+    },
+    {
+      "name": "user2",
+      "email": "lingobarter.user2@gmail.com",
+      "password": "user2lingobarter",
+      "roles": [
+        "user"
+      ],
+      "username": "user2",
+      "tagline": "You know what!!!????!!!!",
+      "bio": "I do teach and learn!!! Haha",
+      "avatar_file_path": "default-avatar.png",
+      "teach_langs": [
+        {
+          "language_id": "Chinese Simplified"
+        },
+        {
+          "language_id": "English"
+        }
+      ],
+      "learn_langs": [
+        {
+          "language_id": "Cantonese",
+          "level": 5
+        }
+      ],
+      "location": {
+        "type": "Point",
+        "coordinates": [
+          111.6,
+          30.5
+        ]
+      },
+      "birthday": 1340942400.0,
+      "gender": "female",
+      "nationality": "UK",
+      "partners": []
+    }
+  ],
+  "configs": [
+    {
+      "group": "site",
+      "description": "Preferences for website",
+      "values": [
+        {
+          "name": "site_name",
+          "rawvalue": "Lingobarter website",
+          "formatter": "text"
+        },
+        {
+          "name": "site_keywords",
+          "rawvalue": "lingobarter,flask,mongo,python",
+          "formatter": "text"
+        },
+        {
+          "name": "site_description",
+          "rawvalue": "The best in the World",
+          "formatter": "text"
+        },
+        {
+          "name": "site_tagline",
+          "rawvalue": "The best in the World",
+          "formatter": "text"
+        },
+        {
+          "name": "site_author",
+          "rawvalue": "Cloud Computing",
+          "formatter": "text"
+        },
+        {
+          "name": "site_logo",
+          "rawvalue": "/static/img/logo_white.png",
+          "formatter": "text"
+        }
+      ]
+    },
+    {
+      "group": "settings",
+      "description": "App settings override CAUTION!!!",
+      "values": [
+        {
+          "name": "EXAMPLE",
+          "rawvalue": "this_overwrite_the_value_in_settings",
+          "formatter": "text"
+        }
+      ]
+    }
+  ],
+  "languages": [
+    {
+      "name": "English",
+      "u_name": "English",
+      "abbrev": "EN"
+    },
+    {
+      "name": "Chinese Simplified",
+      "u_name": "中文(简体)",
+      "abbrev": "CN"
+    },
+    {
+      "name": "Chinese Traditional",
+      "u_name": "中文(繁体)",
+      "abbrev": "CN"
+    },
+    {
+      "name": "Cantonese",
+      "u_name": "粤语Canton",
+      "abbrev": "CN"
+    },
+    {
+      "name": "Japanese",
+      "u_name": "日本語",
+      "abbrev": "JP"
+    },
+    {
+      "name": "Korean",
+      "u_name": "한국어",
+      "abbrev": "KR"
+    },
+    {
+      "name": "Spanish",
+      "u_name": "Español",
+      "abbrev": "ES"
+    },
+    {
+      "name": "French",
+      "u_name": "Français",
+      "abbrev": "FR"
+    },
+    {
+      "name": "Portuguese",
+      "u_name": "Português",
+      "abbrev": "PT"
+    },
+    {
+      "name": "German",
+      "u_name": "Deutsch",
+      "abbrev": "DE"
+    },
+    {
+      "name": "Italian",
+      "u_name": "Italiano",
+      "abbrev": "IT"
+    },
+    {
+      "name": "Russian",
+      "u_name": "Русский",
+      "abbrev": "RU"
+    },
+    {
+      "name": "Arabic",
+      "u_name": "العربية",
+      "abbrev": "AR"
+    }
+  ]
 }

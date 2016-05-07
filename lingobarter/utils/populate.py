@@ -5,8 +5,9 @@ import uuid
 
 from lingobarter.core.models.config import Config, Lingobarter
 from lingobarter.core.models.custom_values import CustomValue
-from lingobarter.modules.accounts.models import User, Role
+from lingobarter.modules.accounts.models import User, Role, Language, LanguageItem, Location
 from mongoengine import DoesNotExist
+from .dateformat import timestamp_to_datetime
 
 logger = logging.getLogger()
 
@@ -41,38 +42,25 @@ class Populate(object):
         return uuid.uuid4().hex
 
     def create_initial_superuser(self):
-        password = self.generate_random_password()
         user_data = {
             "name": "Lingobarter Admin",
-            "email": "admin@lingobarter.com",
-            "gravatar_email": "jet.in.brain@gmail.com",
-            "password": password[:6],
+            "email": "lingo4barter@gmail.com",
+            "password": "lingobarter!",
             "roles": ["admin"],
-            "bio": "Lingobarter Example Admin",
+            "username": "admin",
             "tagline": "Lingobarter is the best language exchange platform!",
-            "links": [
-                {
-                    "title": "facebook",
-                    "link": "http://facebook.com/lingobarter",
-                    "icon": "facebook",
-                    "css_class": "facebook",
-                    "order": 0
-                },
-                {
-                    "title": "github",
-                    "link": "http://github.com/lingobarter",
-                    "icon": "github",
-                    "css_class": "github",
-                    "order": 0
-                },
-                {
-                    "title": "twitter",
-                    "link": "http://twitter.com/lingobarter",
-                    "icon": "twitter",
-                    "css_class": "twitter",
-                    "order": 0
-                }
-            ]
+            "bio": "I don't teach and learn",
+            "avatar_file_path": "default-avatar.png",
+            "teach_langs": [],
+            "learn_langs": [],
+            "location": {
+                "type": "Point",
+                "coordinates": [125.6, 10.1]
+            },
+            "birthday": 1340942400.0,
+            "gender": "unknown",
+            "nationality": "China",
+            "partners": []
         }
         user_obj = self.create_user(user_data)
         return user_data, user_obj
@@ -109,6 +97,10 @@ class Populate(object):
         if name not in self.users:
             pwd = data.get("password")
             data['roles'] = [self.role(role) for role in data.get('roles')]
+            data['birthday'] = timestamp_to_datetime(data.get('birthday'))
+            data['teach_langs'] = [LanguageItem(**lang) for lang in data.get('teach_langs', [])]
+            data['learn_langs'] = [LanguageItem(**lang) for lang in data.get('learn_langs', [])]
+            data['location'] = Location(**data['location']) if data.get('location') else None
             user = User.createuser(**data)
             self.users[name] = user
             logger.info("Created: User: mail:%s pwd:%s", user.email, pwd)
@@ -135,6 +127,19 @@ class Populate(object):
         value = CustomValue(**data)
         self.custom_values[value.name] = value
         return value
+
+    @staticmethod
+    def create_language(data):
+        try:
+            return Language.objects.get(name=data.get('name'))
+        except DoesNotExist:
+            return Language.objects.create(**data)
+
+    def create_languages(self):
+        languages_data = self.json_data.get('languages')
+
+        for language in languages_data:
+            self.create_language(language)
 
     def create_configs(self):
         configs_data = self.json_data.get('configs')

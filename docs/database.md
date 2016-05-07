@@ -48,7 +48,7 @@ Language Item
 -------------
 | name        | type     | default | max length | min length | required | unique | regex | description                      |
 |-------------|----------|---------|------------|------------|----------|--------|-------|----------------------------------|
-| language_id | string   |         | 10         |            | true     |        |       | abbrev name for display(e.g. EN) |
+| language_id | string   |         | 10         |            | true     |        |       | full name for display(e.g. English) |
 | level       | int      | 0       |            |            | true     |        |       | language level                   |
 
 Location
@@ -108,7 +108,7 @@ Language
 |--------|--------|---------|------------|------------|----------|--------|-------|---------------------------------|
 | name   | string |         | 50         |            | true     | true   |       | name of the language in latino  |
 | u_name | string |         | 100        |            |          |        |       | native name of the language     |
-| _id    | string |         | 10         |            | true     |        |       | abbrev name for display(e.g. EN)|
+| abbrev | string |         | 10         |            | true     |        |       | abbrev name for display(e.g. EN)|
 
 Chat
 ----

@@ -20,8 +20,9 @@ def configure(app, db):
         )
         try:
             populate.create_configs()
+            populate.create_languages()
             populate.role("admin")
-            populate.role("author")
+            populate.role("user")
             try:
                 with app.app_context():
                     populate.create_initial_superuser()
