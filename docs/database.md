@@ -29,7 +29,7 @@ User Collection
 | tagline              | string                        |                       | 255        |            |          |        |       | user short tagline                                   |
 | bio                  | string                        |                       |            |            |          |        |       | user long self-introduction                          |
 | links                | list (embedded: UserLink)     |                       |            |            |          |        |       | user social networking external links                |
-| use_avatar_from      | string                        | gravatar              |            |            |          |        |       | choices between (gravatar, url, upload and facebook) |
+| use_avatar_from      | string                        | upload                |            |            |          |        |       | choices between (gravatar, url, upload and facebook) |
 | gravatar_email       | email                         |                       | 255        |            |          |        |       | for choice gravatar                                  |
 | avatar_file_path     | string                        |                       |            |            |          |        |       | for choice upload                                    |
 | avatar_url           | string                        |                       | 255        |            |          |        |       | for choice url                                       |
