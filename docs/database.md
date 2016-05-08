@@ -128,7 +128,7 @@ Message
 | voice_file_path | string   |         |            |            |          |        |       |                                     |
 | text_content    | string   |         |            |            |          |        |       |                                     |
 | image_file_path | string   |         |            |            |          |        |       |                                     |
-| delivered       | boolean  | false   |            |            |          |        |       | whether the message is delivered    |
+| undelivered     | list (objectid)  | list of objectid of all members in chat(to_chat)   |            |            |        |        |       | list of members in chat(to_chat) who have not received this message    |
 | timestamp       | datetime | now     |            |            |          |        |       |                                     |
 
 Partner Request
