@@ -129,6 +129,7 @@ class UserResource(Resource):
             message='Successfully get user own profile',
             status=200,
             response={
+                'id': str(user.id),
                 'name': user.username if user.name is None else user.name,
                 'email': user.email,
                 'username': user.username,

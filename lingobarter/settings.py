@@ -266,3 +266,6 @@ CELERY configuration
 # Celery default using redis, we may move to rabbitMQ in future
 CELERY_ENABLED = False
 CELERY_BROKER_URL = 'redis://localhost:6379/1'
+
+REDIS_SOCKET = False
+REDIS_SOCKET_DB = 2

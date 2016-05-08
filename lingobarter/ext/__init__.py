@@ -3,7 +3,7 @@ from lingobarter.core.admin import configure_admin
 from lingobarter.core.cache import cache
 from lingobarter.core.db import db
 from . import (generic, babel, blueprints, error_handlers, before_request, mail, celery_app,
-               context_processors, views, fixtures, oauthlib, security, development, redis_session)
+               context_processors, views, fixtures, oauthlib, security, development, redis_session, socket_manager)
 
 
 def configure_extensions(app, admin, socket_io):
@@ -14,6 +14,7 @@ def configure_extensions(app, admin, socket_io):
     :return:
     """
     redis_session.configure(app)
+    socket_manager.configure(app)
     cache.init_app(app)
     babel.configure(app)
     generic.configure(app)

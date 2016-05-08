@@ -116,6 +116,7 @@ Chat
 |---------|-----------------|-----------------|------------|------------|----------|--------|-------|----------------------------------------------------------------------------------------------------------------------------|
 | name    | string          | see description | 50         |            | true     |        |       | the name of chat will be ignored if it is a p2p chat and will be several users' username by default if it is a group chat  |
 | members | list (objectId) | []              |            |            |          |        |       | list of members' ids                                                                                                       |
+| last_updated | datetime | now              |            |            |          |        |       | last time the chat updated (created or some members talked)                                                                                                       |
 
 Message
 -------

@@ -3,14 +3,15 @@
 import logging
 from random import randint
 
+from bson.objectid import ObjectId
 from flask import url_for
 from flask.ext.security import UserMixin, RoleMixin
 from flask.ext.security.utils import encrypt_password
 from flask_gravatar import Gravatar
 from lingobarter.core.db import db
 from lingobarter.core.models.custom_values import HasCustomValue
-from lingobarter.utils.text import abbreviate, slugify
 from lingobarter.utils import dateformat
+from lingobarter.utils.text import abbreviate, slugify
 
 logger = logging.getLogger()
 
@@ -94,9 +95,9 @@ class UserSetting(db.EmbeddedDocument):
 
     def __unicode__(self):
         return u"{0} - {1} - {2} - {3} - {4} - {5} - {6}".format(self.strict_lang_match, self.same_gender,
-                                                                       self.age_range, self.hide_from_nearby,
-                                                                       self.hide_from_search, self.hide_info_fields,
-                                                                       self.partner_confirmation)
+                                                                 self.age_range, self.hide_from_nearby,
+                                                                 self.hide_from_search, self.hide_info_fields,
+                                                                 self.partner_confirmation)
 
 
 class LearnPoint(db.EmbeddedDocument):
@@ -109,8 +110,8 @@ class LearnPoint(db.EmbeddedDocument):
 
     def __unicode__(self):
         return u"{0} - {1} - {2} - {3} - {4} - {5}".format(self.favorites, self.pronunciations,
-                                                                 self.translations, self.transliterations,
-                                                                 self.corrections, self.transcriptions)
+                                                           self.translations, self.transliterations,
+                                                           self.corrections, self.transcriptions)
 
 
 class User(db.DynamicDocument, HasCustomValue, UserMixin):
@@ -169,6 +170,14 @@ class User(db.DynamicDocument, HasCustomValue, UserMixin):
     learn_points = db.EmbeddedDocumentField(LearnPoint, default=LearnPoint())
     nationality = db.StringField()
     partners = db.ListField(db.ObjectIdField(), default=[])
+
+    def add_partner(self, user_id):
+        if type(user_id) == str:
+            user_id = ObjectId(user_id)
+        if user_id in self.partners:
+            return
+        self.partners.append(user_id)
+        self.save()
 
     def get_avatar_url(self, *args, **kwargs):
         if self.use_avatar_from == 'url':
@@ -260,12 +269,52 @@ class User(db.DynamicDocument, HasCustomValue, UserMixin):
     def get_user_by_username(cls, username):
         return cls.objects(username=username).first()
 
-    """
-        get profile by username
-    """
     @classmethod
-    def get_other_profile(cls, username):
-        user = User.get_user_by_username(username)
+    def get_user_by_id(cls, user_id):
+        if type(user_id) == str:
+            user_id = ObjectId(user_id)
+        return cls.objects(_id=user_id).first()
+
+    @classmethod
+    def get_other_simplified_profile(cls, username=None, user_id=None):
+        """
+        get simplified profile by username or id
+        :param username:
+        :param user_id:
+        :return:
+        """
+        if username:
+            user = User.get_user_by_username(username)
+        elif user_id:
+            user = User.get_user_by_id(user_id)
+        else:
+            return None
+
+        if user is None:
+            return None
+
+        profile = {
+            'id': str(user.id),
+            'name': user.username if user.name is None else user.name,
+            'username': user.username,
+            'avatar_url': user.get_avatar_url() if user.avatar_file_path is not None else None
+        }
+
+        return profile
+
+    @classmethod
+    def get_other_profile(cls, username=None, user_id=None):
+        """
+        get profile by username or id
+        :param user_id:
+        :param username:
+        """
+        if username:
+            user = User.get_user_by_username(username)
+        elif user_id:
+            user = User.get_user_by_id(user_id)
+        else:
+            return None
 
         if user is None:
             return None
@@ -289,6 +338,7 @@ class User(db.DynamicDocument, HasCustomValue, UserMixin):
         invisible_fields = user.settings.hide_info_fields
 
         profile = {
+            'id': str(user.id),
             'name': user.username if user.name is None else user.name,
             'username': user.username,
             'tagline': user.tagline,
