@@ -35,6 +35,7 @@ class SearchResource(Resource):
         # 'area': dictionary.
         #        type: type of area, we currently only support Polygon
         #        coordinates: a list of [float(x), float(y)]
+        #        we currently only search for users whose location's type is point
         # 'sort_by_nearest': bool, if true, sort by distance to current user's location
         #                    default: false
     """
@@ -53,6 +54,12 @@ class SearchResource(Resource):
         #                level will not be ignored, set to be 0 if not provided
         # 'has_bio': a bool value, if true, only accept users who have bio in their profile
         #            this value will not be False
+        # 'area': dictionary.
+        #        type: type of area, we currently only support Polygon
+        #        coordinates: a list of [float(x), float(y)]
+        #        we currently only search for users whose location's type is point
+        # 'sort_by_nearest': bool, if true, sort by distance to current user's location
+        #                    default: false
         filter_conditions = {}
 
         # we get filter data from front end
@@ -185,30 +192,34 @@ class SearchResource(Resource):
             query_filter.append({'bio': {'$exists': True}})
 
         # area
+        # we currently only search for users whose location's type is point
         if filter_conditions.get('area') is not None:
             if filter_conditions['area'].get('type') == 'Polygon':
                 query_filter.append(
                     {
-                        'location.coordinates': {
-                            '$geoWithin': {
-                                '$polygon': filter_conditions['area']['coordinates']
+                        '$and': [
+                            {'location.type': {'$eq': 'Point'}},
+                            {'location.coordinates': {
+                                '$geoWithin': {
+                                    '$polygon': filter_conditions['area']['coordinates'] }
+                                }
                             }
-                        }
+                        ]
                     }
                 )
 
         # sort by nearest
         # We currently only support this functionality when user's location is Point
-        # if (filter_conditions.get('sort_by_nearest') is not None) and (filter_conditions['sort_by_nearest']):
-        #     if (user.location['type'] == 'Point') and (len(user.location['coordinates']) == 2):
-        #         query_filter.append(
-        #             {'$and': [
-        #                 {'location.type': {'$eq': 'Point'}},
-        #                 {'location.coordinates': {'$size': 2}}
-        #                 # {'location.coordinates': {'$size': 2}},
-        #                 # {'location.coordinates': {'$near': {user.location['coordinates']}}}
-        #             ]}
-        #         )
+        if (filter_conditions.get('sort_by_nearest') is not None) and (filter_conditions['sort_by_nearest']):
+            if (user.location['type'] == 'Point') and (len(user.location['coordinates']) == 2):
+                query_filter.append(
+                    {'$and': [
+                        {'location.type': {'$eq': 'Point'}},
+                        # {'location.coordinates': {'$size': 2}}
+                        {'location.coordinates': {'$size': 2}},
+                        {'location.coordinates': {'$near': user.location.coordinates}}
+                    ]}
+                )
 
         # we also need to filter out the user himself
         query_filter.append({'username': {'$ne': user.username}})
@@ -224,7 +235,6 @@ class SearchResource(Resource):
         # get acceptable users' profiles
         acceptable_users_profiles = []
         for acceptable_user in acceptable_users:
-            print acceptable_user.email
             acceptable_users_profiles.append(User.get_other_profile(acceptable_user.username))
 
         return render_json(message='Successfully search users.', status=200, response=acceptable_users_profiles)
