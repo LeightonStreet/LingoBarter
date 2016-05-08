@@ -189,7 +189,7 @@ class SearchResource(Resource):
             if filter_conditions['area'].get('type') == 'Polygon':
                 query_filter.append(
                     {
-                        'location': {
+                        'location.coordinates': {
                             '$geoWithin': {
                                 '$polygon': filter_conditions['area']['coordinates']
                             }
@@ -199,15 +199,16 @@ class SearchResource(Resource):
 
         # sort by nearest
         # We currently only support this functionality when user's location is Point
-        if (filter_conditions.get('sort_by_nearest') is not None) and (filter_conditions['sort_by_nearest']):
-            if (user.location['type'] == 'Point') and (len(user.location['coordinates']) == 1):
-                query_filter.append(
-                    {
-                        'location': {
-                            '$near': user.location
-                        }
-                    }
-                )
+        # if (filter_conditions.get('sort_by_nearest') is not None) and (filter_conditions['sort_by_nearest']):
+        #     if (user.location['type'] == 'Point') and (len(user.location['coordinates']) == 2):
+        #         query_filter.append(
+        #             {'$and': [
+        #                 {'location.type': {'$eq': 'Point'}},
+        #                 {'location.coordinates': {'$size': 2}}
+        #                 # {'location.coordinates': {'$size': 2}},
+        #                 # {'location.coordinates': {'$near': {user.location['coordinates']}}}
+        #             ]}
+        #         )
 
         # we also need to filter out the user himself
         query_filter.append({'username': {'$ne': user.username}})
@@ -223,6 +224,7 @@ class SearchResource(Resource):
         # get acceptable users' profiles
         acceptable_users_profiles = []
         for acceptable_user in acceptable_users:
+            print acceptable_user.email
             acceptable_users_profiles.append(User.get_other_profile(acceptable_user.username))
 
         return render_json(message='Successfully search users.', status=200, response=acceptable_users_profiles)
