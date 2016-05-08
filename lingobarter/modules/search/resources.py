@@ -32,6 +32,11 @@ class SearchResource(Resource):
         #                                        level represents acceptable learn languages of other users
         #                                        default value of level is 0)
         # 'has_bio': bool, if true, only accept users who have bio in their profile
+        # 'area': dictionary.
+        #        type: type of area, we currently only support Polygon
+        #        coordinates: a list of [float(x), float(y)]
+        # 'sort_by_nearest': bool, if true, sort by distance to current user's location
+        #                    default: false
     """
 
     @auth_token_required
@@ -80,6 +85,18 @@ class SearchResource(Resource):
         filter_conditions['page_id'] = filter_data['page_id'] if filter_data.get('page_id') is not None else 0
 
         filter_conditions['page_size'] = filter_data['page_size'] if filter_data.get('page_size') is not None else 20
+
+        if filter_data.get('area') is not None:
+            if filter_data['area'].get('type') == 'Polygon':
+                if len(filter_data['area'].get('coordinates')) >= 3:
+                    filter_conditions['area'] = {}
+                    filter_conditions['area']['type'] = filter_data['area'].get('type')
+                    filter_conditions['area']['coordinates'] = \
+                        [[float(x), float(y)] for [x, y] in filter_data['area']['coordinates']]
+
+        if filter_data.get('sort_by_nearest') is not None:
+            if filter_data['sort_by_nearest']:
+                filter_conditions['sort_by_nearest'] = True
 
         # generate query filter
         # age_range
@@ -166,6 +183,31 @@ class SearchResource(Resource):
         # has_bio
         if filter_conditions.get('has_bio') is not None:
             query_filter.append({'bio': {'$exists': True}})
+
+        # area
+        if filter_conditions.get('area') is not None:
+            if filter_conditions['area'].get('type') == 'Polygon':
+                query_filter.append(
+                    {
+                        'location': {
+                            '$geoWithin': {
+                                '$polygon': filter_conditions['area']['coordinates']
+                            }
+                        }
+                    }
+                )
+
+        # sort by nearest
+        # We currently only support this functionality when user's location is Point
+        if (filter_conditions.get('sort_by_nearest') is not None) and (filter_conditions['sort_by_nearest']):
+            if (user.location['type'] == 'Point') and (len(user.location['coordinates']) == 1):
+                query_filter.append(
+                    {
+                        'location': {
+                            '$near': user.location
+                        }
+                    }
+                )
 
         # we also need to filter out the user himself
         query_filter.append({'username': {'$ne': user.username}})
