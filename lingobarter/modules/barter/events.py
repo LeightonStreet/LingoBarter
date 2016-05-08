@@ -2,13 +2,12 @@ import functools
 
 from bson.objectid import ObjectId
 from flask import current_app, request
-from flask.ext.security import current_user
 from flask.ext.security.decorators import _check_token
 from flask_socketio import disconnect
 from flask_socketio import emit
 from lingobarter.core.json import render_json
 from lingobarter.modules.accounts.models import User
-from lingobarter.utils.dateformat import datetime_to_timestamp
+from lingobarter.utils import get_current_user, dateformat
 from .models import PartnerRequest, Chat
 
 
@@ -27,13 +26,15 @@ def register_events(socket_io):
     @socket_io.on('connect')
     @authenticated_only
     def handle_connect():
-        current_app.socket_map.add(current_user.username, request.sid)
+        current_user = get_current_user()
+        current_app.socket_map.add(current_user.id, request.sid)
         emit('connected', render_json(message='connected', status=200))
 
     @socket_io.on('disconnect')
     @authenticated_only
     def handle_disconnect():
-        current_app.socket_map.delete(current_user.username)
+        current_user = get_current_user()
+        current_app.socket_map.delete(current_user.id)
 
     @socket_io.on('request new partner')
     @authenticated_only
@@ -44,6 +45,7 @@ def register_events(socket_io):
             client emit event: new partner request
         :param data: {'to_id': '...'}
         """
+        current_user = get_current_user()
         to_id = data.get('to_id')
         if not to_id:
             return emit('ret:request new partner',
@@ -56,7 +58,7 @@ def register_events(socket_io):
         PartnerRequest(from_id=current_user.id, to_id=ObjectId(to_id)).save()
         emit('ret:request new partner', render_json(message='request successfully', status=200))
 
-        room_name = current_app.socket_map.get(to_user.username)
+        room_name = current_app.socket_map.get(to_id)
         if room_name:
             emit('new partner request', {
                 'from_id': str(current_user.id)
@@ -71,6 +73,7 @@ def register_events(socket_io):
             client emit event: partner add
         :param data: {'from_id': '...'}
         """
+        current_user = get_current_user()
         from_id = data.get('from_id')
         if not from_id:
             return emit('ret:add partner',
@@ -93,7 +96,7 @@ def register_events(socket_io):
 
         emit('ret:add partner', render_json(message='add successfully', status=200))
 
-        room_name = current_app.socket_map.get(from_user.username)
+        room_name = current_app.socket_map.get(from_id)
         if room_name:
             emit('partner add', {
                 'to_id': str(current_user.id)
@@ -108,6 +111,7 @@ def register_events(socket_io):
             client emit event: partner reject
         :param data: {'from_id': '...'}
         """
+        current_user = get_current_user()
         from_id = data.get('from_id')
         if not from_id:
             return emit('ret:reject partner',
@@ -126,7 +130,7 @@ def register_events(socket_io):
 
         emit('ret:reject partner', render_json(message='reject successfully', status=200))
 
-        room_name = current_app.socket_map.get(from_user.username)
+        room_name = current_app.socket_map.get(from_id)
         if room_name:
             emit('partner reject', {
                 'to_id': str(current_user.id)
@@ -139,12 +143,13 @@ def register_events(socket_io):
         related events
             callback event: ret:browse requests
         """
+        current_user = get_current_user()
         request_list = PartnerRequest.objects(to_id=current_user.id)
         ret = []
         for req in request_list:
             temp = {
                 'from_user': User.get_other_profile(user_id=req.from_id),
-                'timestamp': datetime_to_timestamp(req.timestamp),
+                'timestamp': dateformat.datetime_to_timestamp(req.timestamp),
                 'status': req.status
             }
             ret.append(temp)
@@ -157,6 +162,7 @@ def register_events(socket_io):
         related events
             callback event: ret:browse partners
         """
+        current_user = get_current_user()
         partners_list = [User.get_other_profile(user_id=partner) for partner in current_user.partners]
         emit('ret:browse partners', partners_list)
 
@@ -167,6 +173,7 @@ def register_events(socket_io):
         related events
             callback event: ret:browse chats
         """
+        current_user = get_current_user()
         chats_list = Chat.objects(members__in=current_user.id).order_by('-last_updated')
         ret = []
         for chat in chats_list:

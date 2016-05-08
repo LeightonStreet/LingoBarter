@@ -11,31 +11,35 @@ class SocketManager:
             self.local = {}
         self.prefix = prefix
 
-    def add(self, username, session_id):
+    def add(self, user_id, session_id):
+        user_id = str(user_id)
         if self.local:
-            self.local[username] = session_id
+            self.local[user_id] = session_id
         else:
-            self.redis.setex(self.prefix + username, session_id, int(timedelta(days=1).total_seconds()))
+            self.redis.setex(self.prefix + user_id, session_id, int(timedelta(days=1).total_seconds()))
 
-    def delete(self, username):
+    def delete(self, user_id):
+        user_id = str(user_id)
         if self.local:
-            if self.local.get(username):
-                del self.local[username]
+            if self.local.get(user_id):
+                del self.local[user_id]
         else:
-            self.redis.delete(self.prefix + username)
+            self.redis.delete(self.prefix + user_id)
 
-    def get(self, username):
+    def get(self, user_id):
+        user_id = str(user_id)
         if self.local:
-            return self.local.get(username)
+            return self.local.get(user_id)
         else:
-            return self.redis.get(self.prefix + username)
+            return self.redis.get(self.prefix + user_id)
 
-    def has(self, username):
-        return self.get(username) is not None
+    def has(self, user_id):
+        user_id = str(user_id)
+        return self.get(user_id) is not None
 
     def get_all_users(self):
         """
-        Get all online username list
+        Get all online user_id list
         :return: list
         """
         if self.local:
