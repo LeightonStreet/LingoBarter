@@ -215,9 +215,8 @@ class SearchResource(Resource):
                 query_filter.append(
                     {'$and': [
                         {'location.type': {'$eq': 'Point'}},
-                        # {'location.coordinates': {'$size': 2}}
                         {'location.coordinates': {'$size': 2}},
-                        {'location.coordinates': {'$near': user.location.coordinates}}
+                        {'location.coordinates': {'$nearSphere': user.location.coordinates}}
                     ]}
                 )
 
