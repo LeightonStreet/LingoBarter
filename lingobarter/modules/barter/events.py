@@ -73,14 +73,26 @@ def register_events(socket_io):
             return emit('ret:request new partner',
                         render_json(message='Same pending request exist! Please wait for other user', status=302))
 
-        PartnerRequest(from_id=current_user.id, to_id=ObjectId(to_id), timestamp=datetime.now()).save()
-        emit('ret:request new partner', render_json(message='request successfully', status=200))
+        partner_request = PartnerRequest(from_id=current_user.id, to_id=ObjectId(to_id), timestamp=datetime.now())
+        partner_request.save()
+
+        response_ret = {
+            "to_user": User.get_other_profile(user_id=to_id),
+            "timestamp": dateformat.datetime_to_timestamp(partner_request.timestamp),
+            "status": partner_request.status
+        }
+
+        emit('ret:request new partner', render_response(response_ret))
+
+        ret = {
+            "from_user": User.get_other_profile(user_id=str(current_user.id)),
+            "timestamp": dateformat.datetime_to_timestamp(partner_request.timestamp),
+            "status": partner_request.status
+        }
 
         room_name = current_app.socket_map.get(to_id)
         if room_name:
-            emit('new partner request', {
-                'from_id': str(current_user.id)
-            }, room=room_name)
+            emit('new partner request', ret, room=room_name)
 
     @socket_io.on('add partner')
     @authenticated_only
@@ -113,16 +125,34 @@ def register_events(socket_io):
         add_request.save()
         from_user.add_partner(current_user.id)
         current_user.add_partner(from_id)
-        Chat(name=from_user.username + ', ' + current_user.username,
-             members=[from_user.id, current_user.id], last_updated=datetime.now()).save()
+        chat = Chat(name=from_user.username + ', ' + current_user.username,
+                    members=[from_user.id, current_user.id], last_updated=datetime.now())
+        chat.save()
 
-        emit('ret:add partner', render_json(message='add successfully', status=200))
+        chat_ret = {
+            "id": str(chat.id),
+            "name": chat.name,
+            "members": [User.get_other_simplified_profile(user_id=member_id) for member_id in chat.members],
+            "last_updated": dateformat.datetime_to_timestamp(chat.last_updated)
+        }
+        response_ret = {
+            "chat": chat_ret,
+            "from_user": User.get_other_profile(user_id=from_id),
+            "timestamp": dateformat.datetime_to_timestamp(add_request.timestamp),
+            "status": add_request.status
+        }
+        emit('ret:add partner', render_response(response_ret))
+
+        emitted_ret = {
+            "chat": chat_ret,
+            "to_user": User.get_other_profile(user_id=current_user.id),
+            "timestamp": dateformat.datetime_to_timestamp(add_request.timestamp),
+            "status": add_request.status
+        }
 
         room_name = current_app.socket_map.get(from_id)
         if room_name:
-            emit('partner add', {
-                'to_id': str(current_user.id)
-            }, room=room_name)
+            emit('partner add', emitted_ret, room=room_name)
 
     @socket_io.on('reject partner')
     @authenticated_only
@@ -154,13 +184,23 @@ def register_events(socket_io):
         add_request.status = 'rejected'
         add_request.save()
 
-        emit('ret:reject partner', render_json(message='reject successfully', status=200))
+        response_ret = {
+            "from_user": User.get_other_profile(user_id=from_id),
+            "timestamp": dateformat.datetime_to_timestamp(add_request.timestamp),
+            "status": add_request.status
+        }
+
+        emit('ret:reject partner', render_response(response_ret))
+
+        emitted_ret = {
+            "to_user": User.get_other_profile(user_id=current_user.id),
+            "timestamp": dateformat.datetime_to_timestamp(add_request.timestamp),
+            "status": add_request.status
+        }
 
         room_name = current_app.socket_map.get(from_id)
         if room_name:
-            emit('partner reject', {
-                'to_id': str(current_user.id)
-            }, room=room_name)
+            emit('partner reject', emitted_ret, room=room_name)
 
     @socket_io.on('browse requests')
     @authenticated_only
@@ -206,7 +246,8 @@ def register_events(socket_io):
             temp = {
                 "id": str(chat.id),
                 "name": chat.name,
-                "members": [User.get_other_simplified_profile(user_id=member_id) for member_id in chat.members]
+                "members": [User.get_other_simplified_profile(user_id=member_id) for member_id in chat.members],
+                "last_updated": dateformat.datetime_to_timestamp(chat.last_updated)
             }
             ret.append(temp)
         emit('ret:browse chats', render_response(ret))
@@ -269,7 +310,8 @@ def register_events(socket_io):
         chats_list = [chat.id for chat in Chat.objects(members=current_user.id).only('_id')]
         ret = {}  # store result
 
-        messages_list = Message.objects(to_chat__in=chats_list, undelivered=current_user.id).order_by('-timestamp')  # get all related messages
+        messages_list = Message.objects(to_chat__in=chats_list, undelivered=current_user.id).order_by(
+            '-timestamp')  # get all related messages
 
         for message in messages_list:
             temp_message = {
