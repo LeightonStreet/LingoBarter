@@ -288,9 +288,52 @@ def register_events(socket_io):
         """
         related events
             callback event: ret:send message
-            :param data: {"to_chat": ..., "type": ..., "voice_stream|text_content|image_stream": ...}
+            :param data: {"to_chat": ..., "type": ..., "payload": "voice_stream|text_content|image_stream": ...}
         """
-        pass
+        if data.get("to_chat") is None or data.get("type") is None or data.get("payload") is None:
+            return emit('ret:send message', render_json(message="Message is not complete", status=400))
+
+        current_user = get_current_user()
+        current_chat = Chat.get_chat_by_id(data['to_chat'])
+
+        if current_user.id not in current_chat.members:
+            return emit('ret:send message', render_json(message="You do not belong to this chat", status=403))
+
+        online_set = set([ObjectId(user) for user in current_app.socket_map.get_all_users()])
+        member_set = set(current_chat.members)
+        offline_set = member_set - online_set
+
+        message = Message(from_id=current_user.id, to_chat=ObjectId(data['to_chat']))
+        message.undelivered = list(offline_set)
+        if data['type'] == 'text':
+            message.type = 'text'
+            message.text_content = data['payload']
+
+            ret_payload = data['payload']
+        elif data['type'] == 'voice':
+            ret_payload = '...'
+            pass
+        elif data['type'] == 'image':
+            ret_payload = '...'
+            pass
+        else:
+            return emit('ret:send message', render_json(message="Unknown message type", status=400))
+
+        current_chat.last_updated = message.timestamp
+        current_chat.save()
+        message.save()
+
+        ret_message = {
+            'from_id': str(current_user.id),
+            'to_chat': data['to_chat'],
+            'type': data['type'],
+            'payload': ret_payload,
+            'timestamp': dateformat.datetime_to_timestamp(message.timestamp)
+        }
+        for online_id in (online_set & member_set):
+            emit('message send', ret_message, room=current_app.socket_map.get(online_id))
+
+        emit('ret:send message', render_json(message="Message has been sent", status=200))
 
     @socket_io.on('create group chat')
     @authenticated_only
@@ -566,3 +609,4 @@ def register_events(socket_io):
                     "members": [User.get_other_simplified_profile(user_id=member_id) for member_id in group_chat.members]
                 }
                 emit('group chat update', notification)
+
