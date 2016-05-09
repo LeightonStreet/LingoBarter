@@ -45,7 +45,8 @@ class SocketManager:
         if self.local is not None:
             return self.local.keys()
         else:
-            return self.redis.keys(self.prefix + '*')
+            return [user.strip(self.prefix) for user in self.redis.keys(self.prefix + '*')]
+
 
 
 def configure(app):

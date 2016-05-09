@@ -3,6 +3,7 @@
 
 from datetime import datetime
 
+from bson.objectid import ObjectId
 from lingobarter.core.db import db
 from lingobarter.core.models.custom_values import HasCustomValue
 
@@ -13,6 +14,12 @@ class Chat(db.DynamicDocument, HasCustomValue):
     name = db.StringField(max_length=50, required=True)
     members = db.ListField(db.ObjectIdField(), default=[])
     last_updated = db.DateTimeField(default=datetime.now())
+
+    @classmethod
+    def get_chat_by_id(cls, chat_id):
+        if type(chat_id) != ObjectId:
+            chat_id = ObjectId(chat_id)
+        return cls.objects(_id=chat_id).first()
 
     def __unicode__(self):
         return u"{0} - {1}".format(self.name, self._id)

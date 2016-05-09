@@ -8,7 +8,7 @@ from flask_socketio import emit
 from lingobarter.core.json import render_json
 from lingobarter.modules.accounts.models import User
 from lingobarter.utils import get_current_user, dateformat
-from .models import PartnerRequest, Chat
+from .models import PartnerRequest, Chat, Message
 
 
 def authenticated_only(f):
@@ -226,6 +226,46 @@ def register_events(socket_io):
         """
         related events
             callback event: ret:send message
-            :param data: {"to_chat": ..., "type": ..., "voice_stream|text_content|image_stream": ...}
+            :param data: {"to_chat": ..., "type": ..., "payload": "voice_stream|text_content|image_stream": ...}
         """
-        pass
+        if data.get("to_chat") is None or data.get("type") is None or data.get("payload") is None:
+            return emit('ret:send message', render_json(message="Message is not complete", status=400))
+
+        current_user = get_current_user()
+        current_chat = Chat.get_chat_by_id(data['to_chat'])
+        online_set = set(current_app.socket_map.get_all_users())
+        member_set = set(current_chat.members)
+        offline_set = member_set - online_set
+
+        message = Message(from_id=current_user.id, to_chat=ObjectId(data['to_chat']))
+        message.undelivered = list(offline_set)
+        if data['type'] == 'text':
+            message.type = 'text'
+            message.text_content = data['payload']
+
+            ret_payload = data['payload']
+        elif data['type'] == 'voice':
+            ret_payload = '...'
+            pass
+        elif data['type'] == 'image':
+            ret_payload = '...'
+            pass
+        else:
+            return emit('ret:send message', render_json(message="Unknown message type", status=400))
+
+        current_chat.last_updated = message.timestamp
+        current_chat.save()
+        message.save()
+
+        ret_message = {
+            'from_id': str(current_user.id),
+            'to_chat': data['to_chat'],
+            'type': data['type'],
+            'payload': ret_payload,
+            'timestamp': dateformat.datetime_to_timestamp(message.timestamp)
+        }
+        for online_id in (online_set & member_set):
+            emit('message send', ret_message, room=current_app.socket_map.get(online_id))
+
+        emit('ret:send message', render_json(message="Message has been sent", status=200))
+
