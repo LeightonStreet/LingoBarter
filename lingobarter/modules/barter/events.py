@@ -1,5 +1,7 @@
 import functools
 
+from datetime import datetime
+
 from bson.objectid import ObjectId
 from flask import current_app, request
 from flask.ext.security.decorators import _check_token
@@ -8,7 +10,7 @@ from flask_socketio import emit
 from lingobarter.core.json import render_json
 from lingobarter.modules.accounts.models import User
 from lingobarter.utils import get_current_user, dateformat
-from .models import PartnerRequest, Chat
+from .models import PartnerRequest, Chat, Message
 
 
 def authenticated_only(f):
@@ -209,7 +211,45 @@ def register_events(socket_io):
             callback event: ret:browse messages
         :param data: {"to_chat": ..., "page_id": ..., "page_size": ...}
         """
-        pass
+        # parse data
+        to_chat = ObjectId(data.get('to_chat'))
+        page_id = int(data.get('page_id'))
+        page_size = int(data.get('page_size'))
+
+        # handle bad requests
+        if not to_chat:
+            return emit('ret:browse messages',
+                        render_json(message='please tell me which chat you want to browse', status=400))
+        if not page_id:
+            return emit('ret:browse messages',
+                        render_json(message='please tell me page id', status=400))
+        if not page_size:
+            return emit('ret:browse messages',
+                        render_json(message='please tell me page size', status=400))
+
+        # if this chat does not exist
+        if Chat.objects(id=to_chat).first() is None:
+            return emit('ret:browse messages',
+                        render_json(message='chat with id:' + str(to_chat) + ' does not exist!', status=404))
+
+        # get all messages whose to_chat equals to to_chat
+        start_record_num = page_id * page_size
+        end_record_num = start_record_num + page_size
+        # todo: do we need to sort messages
+        messages_list = Message.objects(to_chat=to_chat).order_by('-timestamp')[start_record_num: end_record_num]
+        ret = []
+        for message in messages_list:
+            temp = {
+                'from_id': str(message.from_id),
+                'to_chat': str(message.to_chat),
+                'type': message.type,
+                'voice_file_path': message.voice_file_path if message.voice_file_path is not None else None,
+                'text_content': message.text_content if message.text_content is not None else None,
+                'image_file_path': message.image_file_path if message.image_file_path is not None else None,
+                'timestamp': dateformat.datetime_to_timestamp(message.timestamp) if message.timestamp is not None else None
+            }
+            ret.append(temp)
+        emit('ret:browse messages', ret)
 
     @socket_io.on('fetch undelivered messages')
     @authenticated_only
@@ -218,7 +258,29 @@ def register_events(socket_io):
         related events
             callback event: ret:fetch undelivered messages
         """
-        pass
+        current_user = get_current_user()
+        chats_list = Chat.objects(members=current_user.id)
+        ret = {} # store result
+
+        for chat in chats_list:
+            messages_list = Message.objects(to_chat=chat.id).order_by('-timestamp')  # get all related messages
+            messages_of_one_chat = []  # store messages that have not been delivered to current user in one chat
+            for message in messages_list:
+                if current_user.id in message.undelivered:  # if this message has not been delivered to current user
+                    temp_message = {
+                        'from_id': str(message.from_id),
+                        'to_chat': str(message.to_chat),
+                        'type': message.type,
+                        'voice_file_path': message.voice_file_path if message.voice_file_path is not None else None,
+                        'text_content': message.text_content if message.text_content is not None else None,
+                        'image_file_path': message.image_file_path if message.image_file_path is not None else None,
+                        'timestamp': dateformat.datetime_to_timestamp(message.timestamp) if message.timestamp is not None else None
+                    }
+                    messages_of_one_chat.append(temp_message)  # fetch message
+            if messages_of_one_chat:  # if there is any undelivered message in this chat
+                ret[str(chat.to_chat)] = messages_of_one_chat  # fetch this chat
+
+        emit('ret:fetch undelivered messages', ret)
 
     @socket_io.on('send message')
     @authenticated_only
@@ -229,3 +291,278 @@ def register_events(socket_io):
             :param data: {"to_chat": ..., "type": ..., "voice_stream|text_content|image_stream": ...}
         """
         pass
+
+    @socket_io.on('create group chat')
+    @authenticated_only
+    def handle_create_group_chat(data):
+        """
+        related events
+            callback event: ret:create group chat
+            :param data: {"members_id_list": [user_id]}
+                         (user non-inclusive, if len(list)<=1, revert)
+            client emit event: group chat create
+                                (user who create this group chat inclusive)
+        """
+        members_id_list = [ObjectId(member_id) for member_id in data.get('members_id_list')]
+        current_user = get_current_user()
+        members_list = []  # new members
+        member_does_not_exist = False
+        member_is_not_partner = False
+        chat_name = current_user.username  # name of this group chat
+
+        # if there are less than two elements in members_id_list, reject
+        # not a group chat
+        if len(members_id_list) <= 1:
+            return emit('ret:create group chat',
+                        render_json(
+                            message='please give me more user id. Cannot create a group chat with only two users',
+                            status=400))
+
+        # get all members, if one or more of them do not exist, error
+        # if one or more of them are not partner of current user, error
+        member_num = 0
+        for member_id in members_id_list:
+            if member_id == current_user.id:
+                continue
+            member = User.objects(id=member_id).first()
+            if member is None:
+                member_does_not_exist = True
+                break
+            if member not in current_user.partners:
+                member_is_not_partner = True
+                break
+            members_list.append(member)
+            member_num = member_num + 1
+            chat_name = chat_name + ', ' + member.username
+
+        if member_num <= 1:
+            return emit('ret:create group chat',
+                        render_json(
+                            message='please give me more user id. Cannot create a group chat with only two users',
+                            status=400))
+
+        if member_does_not_exist:
+            return emit('ret:create group chat',
+                        render_json(
+                            message='please give me correct user id. User you want to add to this chat does not exist',
+                            status=400))
+
+        if member_is_not_partner:
+            return emit('ret:create group chat',
+                        render_json(
+                            message='please give me correct user id. User you want to add to this chat is not your partner',
+                            status=400))
+
+        # create a group chat
+        group_chat = Chat(name=chat_name, members=members_id_list)
+        group_chat.save()
+
+        # notify front-end that this operation succeed
+        emit('ret:create group chat', render_json(message='create group chat successfully', status=200))
+
+        # notify all members of this group chat that they have been invited
+        for member_id in members_id_list:
+            room_name = current_app.socket_map.get(member_id)
+            if room_name:
+                notification = {
+                    "id": str(group_chat.id),
+                    "name": group_chat.name,
+                    "members": [User.get_other_simplified_profile(user_id=member_id) for member_id in group_chat.members]
+                }
+                emit('group chat create', notification)
+
+    @socket_io.on('add member to group chat')
+    @authenticated_only
+    def handle_add_member_to_group_chat(data):
+        """
+        related events
+            callback event: ret:add member to group chat
+            :param data: {"members_id_list": [user_id], "to_chat": ...}
+                         (user non-inclusive, if len(list)<=0, revert)
+            client emit event: group chat update
+                                (user who update this group chat inclusive)
+        """
+        members_id_list = [ObjectId(member_id) for member_id in data.get('members_id_list')]
+        to_chat = ObjectId(data.get('to_chat'))
+        current_user = get_current_user()
+        members_list = []
+        member_does_not_exist = False
+        member_is_not_partner = False
+        chat_name = ", "  # update information for name of this group chat
+        group_chat = Chat.objects(id=to_chat).first()
+
+        # if this chat does not exist, error
+        if group_chat is None:
+            return emit('ret:add member to group chat',
+                        render_json(
+                            message='please give me correct to_chat',
+                            status=400))
+
+        # if there are less than two elements in members_id_list, reject
+        # not a group chat
+        if len(members_id_list) <= 0:
+            return emit('ret:add member to group chat',
+                        render_json(
+                            message='please give me more user id. Cannot add zero new member to group chat',
+                            status=400))
+
+        # get all members, if one or more of them do not exist, error
+        # if one or more of them are not partner of current user, error
+        member_num = 0
+        for member_id in members_id_list:
+            if member_id == current_user.id:
+                continue
+            member = User.objects(id=member_id).first()
+            if member is None:
+                member_does_not_exist = True
+                break
+            if member_id not in current_user.partners:
+                member_is_not_partner = True
+                break
+            members_list.append(member)
+            member_num = member_num + 1
+            chat_name = chat_name + member.username + ', '
+        chat_name = chat_name[:-2]  # remove last ", "
+
+        if member_num <= 0:
+            return emit('ret:add member to group chat',
+                        render_json(
+                            message='please give me more user id. Cannot add zero new member to group chat',
+                            status=400))
+
+        if member_does_not_exist:
+            return emit('ret:add member to group chat',
+                        render_json(
+                            message='please give me correct user id. User you want to add to this chat does not exist',
+                            status=400))
+
+        if member_is_not_partner:
+            return emit('ret:add member to group chat',
+                        render_json(
+                            message='please give me correct user id. User you want to add to this chat is not your partner',
+                            status=400))
+
+        # update group chat
+        group_chat.last_updated = datetime.now()
+        group_chat.name = group_chat.name + chat_name
+        group_chat.members = group_chat.members + members_id_list
+        group_chat.save()
+
+        # notify front-end that this operation succeed
+        emit('ret:add member to group chat', render_json(message='add new member to group chat successfully',
+                                                         status=200))
+
+        # notify all members of this group chat that they have been invited
+        for member_id in group_chat.members:
+            room_name = current_app.socket_map.get(member_id)
+            if room_name:
+                notification = {
+                    "id": str(group_chat.id),
+                    "name": group_chat.name,
+                    "members": [User.get_other_simplified_profile(user_id=member_id) for member_id in group_chat.members]
+                }
+                emit('group chat update', notification)
+
+    @socket_io.on('remove member from group chat')
+    @authenticated_only
+    def handle_remove_member_from_group_chat(data):
+        """
+        related events
+            callback event: ret:remove member to group chat
+            :param data: {"members_id_list": [user_id], "to_chat": ...}
+                         (user non-inclusive, if len(list)<=0, revert)
+            client emit event: group chat update
+                                (user who update this group chat inclusive)
+        """
+        members_id_list = [ObjectId(member_id) for member_id in data.get('members_id_list')] # members to delete
+        to_chat = ObjectId(data.get('to_chat'))
+        current_user = get_current_user()
+        member_not_in_group_chat = False
+        member_does_not_exist = False
+        group_chat = Chat.objects(id=to_chat).first()
+
+        # if this chat does not exist, error
+        if group_chat is None:
+            return emit('ret:remove member to group chat',
+                        render_json(
+                            message='please give me correct to_chat',
+                            status=400))
+
+        if current_user.id != group_chat.members[0].id:
+            return emit('ret:remove member to group chat',
+                        render_json(
+                            message='current user is not allowed to delete this group chat',
+                            status=403))
+
+        # if there are less than two elements in members_id_list, reject
+        # not a group chat
+        if len(members_id_list) <= 0:
+            return emit('ret:remove member to group chat',
+                        render_json(
+                            message='please give me more user id. Cannot remove zero member from group chat',
+                            status=400))
+
+        # get all members, if one or more of them are do not exist, error
+        # if one or more of them are not in this group chat, error
+        member_num = 0
+        for member_id in members_id_list:
+            if member_id == current_user.id:
+                continue
+            member = User.objects(id=member_id).first()
+            if member is None:
+                member_does_not_exist = True
+                break
+            if member_id not in group_chat.members:
+                member_not_in_group_chat = True
+                break
+            member_num = member_num + 1
+
+        if member_num <= 0:
+            return emit('ret:remove member to group chat',
+                        render_json(
+                            message='please give me more user id. Cannot remove zero member from group chat',
+                            status=400))
+
+        if member_does_not_exist:
+            return emit('ret:remove member to group chat',
+                        render_json(
+                            message='please give me correct user id. User you want to remove from this chat does not exist',
+                            status=400))
+
+        if member_not_in_group_chat:
+            return emit('ret:remove member to group chat',
+                        render_json(
+                            message='please give me correct user id. User you want to remove from this chat is not in this group chat',
+                            status=400))
+
+        # update group chat
+
+        # remove members
+        for member_id in members_id_list:
+            group_chat.members.remove(member_id)
+
+        # update name of group chat
+        chat_name = ""
+        for member_id in group_chat.members:
+            member = User.objects(id=member_id).first()
+            chat_name = chat_name + member.username + ', '
+        chat_name = chat_name[:-2]  # remove ", " at the end of chat_name
+        group_chat.name = chat_name
+
+        group_chat.last_updated = datetime.now()
+        group_chat.save()
+
+        # notify front-end that this operation succeed
+        emit('ret:remove member from group chat', render_json(message='remove member from group chat successfully',
+                                                              status=200))
+
+        # notify all members of this group chat that they have been invited
+        for member_id in group_chat.members:
+            room_name = current_app.socket_map.get(member_id)
+            if room_name:
+                notification = {
+                    "id": str(group_chat.id),
+                    "name": group_chat.name,
+                    "members": [User.get_other_simplified_profile(user_id=member_id) for member_id in group_chat.members]
+                }
+                emit('group chat update', notification)
