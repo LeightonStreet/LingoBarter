@@ -200,3 +200,32 @@ def register_events(socket_io):
             }
             ret.append(temp)
         emit('ret:browse chats', ret)
+
+    @socket_io.on('browse messages')
+    @authenticated_only
+    def handle_browse_messages(data):
+        """
+        related events
+            callback event: ret:browse messages
+        :param data: {"to_chat": ..., "page_id": ..., "page_size": ...}
+        """
+        pass
+
+    @socket_io.on('fetch undelivered messages')
+    @authenticated_only
+    def handle_fetch_undelivered_messages():
+        """
+        related events
+            callback event: ret:fetch undelivered messages
+        """
+        pass
+
+    @socket_io.on('send message')
+    @authenticated_only
+    def handle_send_message(data):
+        """
+        related events
+            callback event: ret:send message
+            :param data: {"to_chat": ..., "type": ..., "voice_stream|text_content|image_stream": ...}
+        """
+        pass
