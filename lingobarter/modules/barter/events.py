@@ -179,7 +179,7 @@ def register_events(socket_io):
                 'status': req.status
             }
             ret.append(temp)
-        emit('ret:browse requests', ret)
+        emit('ret:browse requests', render_response(ret))
 
     @socket_io.on('browse partners')
     @authenticated_only
@@ -190,7 +190,7 @@ def register_events(socket_io):
         """
         current_user = get_current_user()
         partners_list = [User.get_other_profile(user_id=partner) for partner in current_user.partners]
-        emit('ret:browse partners', partners_list)
+        emit('ret:browse partners', render_response(partners_list))
 
     @socket_io.on('browse chats')
     @authenticated_only
@@ -209,7 +209,7 @@ def register_events(socket_io):
                 "members": [User.get_other_simplified_profile(user_id=member_id) for member_id in chat.members]
             }
             ret.append(temp)
-        emit('ret:browse chats', ret)
+        emit('ret:browse chats', render_response(ret))
 
     @socket_io.on('browse messages')
     @authenticated_only
