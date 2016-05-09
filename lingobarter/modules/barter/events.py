@@ -47,13 +47,27 @@ def register_events(socket_io):
         """
         current_user = get_current_user()
         to_id = data.get('to_id')
+
+        if to_id == str(current_user.id):
+            return emit('ret:request new partner',
+                        render_json(message='You cannot add yourself', status=403))
+
         if not to_id:
             return emit('ret:request new partner',
                         render_json(message='please tell me whom you want to request', status=400))
+
+        if current_user.has_partner(to_id):
+            return emit('ret:request new partner',
+                        render_json(message='This user is already your partner', status=409))
+
         to_user = User.get_user_by_id(to_id)
         if to_user is None:
             return emit('ret:request new partner',
                         render_json(message='user with id:' + to_id + ' does not exist!', status=404))
+
+        if PartnerRequest.objects(from_id=current_user.id, to_id=ObjectId(to_id), status="pending").first():
+            return emit('ret:request new partner',
+                        render_json(message='Same pending request exist! Please wait for other user', status=404))
 
         PartnerRequest(from_id=current_user.id, to_id=ObjectId(to_id)).save()
         emit('ret:request new partner', render_json(message='request successfully', status=200))
@@ -87,6 +101,11 @@ def register_events(socket_io):
         if add_request is None:
             return emit('ret:add partner',
                         render_json(message='partner request does not exist', status=404))
+
+        if add_request.status != "pending":
+            return emit('ret:add partner',
+                        render_json(message='partner request has been handled already', status=403))
+
         add_request.status = 'added'
         add_request.save()
         from_user.add_partner(current_user.id)
@@ -125,6 +144,11 @@ def register_events(socket_io):
         if add_request is None:
             return emit('ret:reject partner',
                         render_json(message='partner request does not exist', status=404))
+
+        if add_request.status != "pending":
+            return emit('ret:add partner',
+                        render_json(message='partner request has been handled already', status=403))
+
         add_request.status = 'rejected'
         add_request.save()
 

@@ -171,6 +171,11 @@ class User(db.DynamicDocument, HasCustomValue, UserMixin):
     nationality = db.StringField()
     partners = db.ListField(db.ObjectIdField(), default=[])
 
+    def has_partner(self, user_id):
+        if type(user_id) != ObjectId:
+            user_id = ObjectId(user_id)
+        return user_id in self.partners
+
     def add_partner(self, user_id):
         if type(user_id) != ObjectId:
             user_id = ObjectId(user_id)
