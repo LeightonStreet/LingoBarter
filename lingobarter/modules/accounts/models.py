@@ -172,7 +172,7 @@ class User(db.DynamicDocument, HasCustomValue, UserMixin):
     partners = db.ListField(db.ObjectIdField(), default=[])
 
     def add_partner(self, user_id):
-        if type(user_id) == str:
+        if type(user_id) != ObjectId:
             user_id = ObjectId(user_id)
         if user_id in self.partners:
             return
@@ -271,7 +271,7 @@ class User(db.DynamicDocument, HasCustomValue, UserMixin):
 
     @classmethod
     def get_user_by_id(cls, user_id):
-        if type(user_id) == str:
+        if type(user_id) != ObjectId:
             user_id = ObjectId(user_id)
         return cls.objects(_id=user_id).first()
 
