@@ -190,13 +190,13 @@ def register_events(socket_io):
             callback event: ret:browse chats
         """
         current_user = get_current_user()
-        chats_list = Chat.objects(members__in=current_user.id).order_by('-last_updated')
+        chats_list = Chat.objects(members=current_user.id).order_by('-last_updated')
         ret = []
         for chat in chats_list:
             temp = {
                 "id": str(chat.id),
                 "name": chat.name,
-                "members": [User.get_other_simplified_profile(member_id) for member_id in chat.members]
+                "members": [User.get_other_simplified_profile(user_id=member_id) for member_id in chat.members]
             }
             ret.append(temp)
         emit('ret:browse chats', ret)
