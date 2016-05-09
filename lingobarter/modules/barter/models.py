@@ -3,6 +3,7 @@
 
 from datetime import datetime
 
+from flask import url_for
 from bson.objectid import ObjectId
 from lingobarter.core.db import db
 from lingobarter.core.models.custom_values import HasCustomValue
@@ -39,8 +40,18 @@ class Message(db.DynamicDocument, HasCustomValue):
     text_content = db.StringField()
     image_file_path = db.StringField()
     undelivered = db.ListField(db.ObjectIdField(), default=[])
-    # todo: default time->now
     timestamp = db.DateTimeField(default=datetime.now())
+
+    def get_file_url(self):
+        if self.type == 'text':
+            return None
+        elif self.type == 'voice':
+            file_path = self.voice_file_path
+        else:
+            file_path = self.image_file_path
+        return url_for(
+            'lingobarter.core.media', filename=file_path
+        )
 
     def __unicode__(self):
         return u"{0} - {1} - {2} - {3}".format(self.from_id, self.to_chat, self.type, self.timestamp)

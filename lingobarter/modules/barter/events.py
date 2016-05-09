@@ -1,7 +1,10 @@
 import functools
+import uuid
+import errno
 
+import os
 from bson.objectid import ObjectId
-from flask import current_app, request
+from flask import current_app, request, url_for
 from flask.ext.security.decorators import _check_token
 from flask_socketio import disconnect
 from flask_socketio import emit
@@ -231,6 +234,9 @@ def register_events(socket_io):
         if data.get("to_chat") is None or data.get("type") is None or data.get("payload") is None:
             return emit('ret:send message', render_json(message="Message is not complete", status=400))
 
+        if data['type'] not in ('text', 'voice', 'image'):
+            return emit('ret:send message', render_json(message="Unknown message type", status=400))
+
         current_user = get_current_user()
         current_chat = Chat.get_chat_by_id(data['to_chat'])
 
@@ -243,19 +249,46 @@ def register_events(socket_io):
 
         message = Message(from_id=current_user.id, to_chat=ObjectId(data['to_chat']))
         message.undelivered = list(offline_set)
+        message.type = data['type']
         if data['type'] == 'text':
-            message.type = 'text'
             message.text_content = data['payload']
-
             ret_payload = data['payload']
         elif data['type'] == 'voice':
-            ret_payload = '...'
-            pass
-        elif data['type'] == 'image':
-            ret_payload = '...'
-            pass
+            audio_data = data['payload']
+            audio_filename = uuid.uuid4().hex + '.amr'
+            audio_path = os.path.join(current_app.config['MEDIA_ROOT'], current_user.username, audio_filename)
+
+            if not os.path.exists(os.path.dirname(audio_path)):
+                try:
+                    os.makedirs(os.path.dirname(audio_path))
+                except OSError as exc:  # Guard against race condition
+                    if exc.errno != errno.EEXIST:
+                        return emit('ret:send message', render_json(message=exc.message, status=502))
+
+            audio_file = open(audio_path, "wb")
+            bin_data = bytearray(audio_data)
+            audio_file.write(bin_data)
+
+            message.voice_file_path = os.path.join(current_user.username, audio_filename)
+            ret_payload = message.get_file_url()
         else:
-            return emit('ret:send message', render_json(message="Unknown message type", status=400))
+            image_data = data['payload']
+            image_filename = uuid.uuid4().hex + '.png'
+            image_path = os.path.join(current_app.config['MEDIA_ROOT'], current_user.username, image_filename)
+
+            if not os.path.exists(os.path.dirname(image_path)):
+                try:
+                    os.makedirs(os.path.dirname(image_path))
+                except OSError as exc:  # Guard against race condition
+                    if exc.errno != errno.EEXIST:
+                        return emit('ret:send message', render_json(message=exc.message, status=502))
+
+            image_file = open(image_path, "wb")
+            bin_data = bytearray(image_data)
+            image_file.write(bin_data)
+
+            message.image_file_path = os.path.join(current_user.username, image_filename)
+            ret_payload = message.get_file_url()
 
         current_chat.last_updated = message.timestamp
         current_chat.save()
@@ -272,4 +305,3 @@ def register_events(socket_io):
             emit('message send', ret_message, room=current_app.socket_map.get(online_id))
 
         emit('ret:send message', render_json(message="Message has been sent", status=200))
-
