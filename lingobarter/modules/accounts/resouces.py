@@ -242,6 +242,7 @@ class UserResource(Resource):
                 if new_learn_points.get('transcriptions') is not None else user.learn_points.transcriptions
 
         try:
+            user.complete = True
             user.save()
             return render_json(message='Successfully updated user profile', status=200)
         except Exception as err:
