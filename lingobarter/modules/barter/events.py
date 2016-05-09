@@ -233,7 +233,11 @@ def register_events(socket_io):
 
         current_user = get_current_user()
         current_chat = Chat.get_chat_by_id(data['to_chat'])
-        online_set = set(current_app.socket_map.get_all_users())
+
+        if current_user.id not in current_chat.members:
+            return emit('ret:send message', render_json(message="You do not belong to this chat", status=403))
+
+        online_set = set([ObjectId(user) for user in current_app.socket_map.get_all_users()])
         member_set = set(current_chat.members)
         offline_set = member_set - online_set
 

@@ -48,7 +48,6 @@ class SocketManager:
             return [user.strip(self.prefix) for user in self.redis.keys(self.prefix + '*')]
 
 
-
 def configure(app):
     redis = None
     if app.config.get('REDIS_SOCKET'):
