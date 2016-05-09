@@ -13,14 +13,14 @@ class SocketManager:
 
     def add(self, user_id, session_id):
         user_id = str(user_id)
-        if self.local:
+        if self.local is not None:
             self.local[user_id] = session_id
         else:
             self.redis.setex(self.prefix + user_id, session_id, int(timedelta(days=1).total_seconds()))
 
     def delete(self, user_id):
         user_id = str(user_id)
-        if self.local:
+        if self.local is not None:
             if self.local.get(user_id):
                 del self.local[user_id]
         else:
@@ -28,7 +28,7 @@ class SocketManager:
 
     def get(self, user_id):
         user_id = str(user_id)
-        if self.local:
+        if self.local is not None:
             return self.local.get(user_id)
         else:
             return self.redis.get(self.prefix + user_id)
@@ -42,7 +42,7 @@ class SocketManager:
         Get all online user_id list
         :return: list
         """
-        if self.local:
+        if self.local is not None:
             return self.local.keys()
         else:
             return self.redis.keys(self.prefix + '*')
