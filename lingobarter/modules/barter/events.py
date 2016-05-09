@@ -9,7 +9,7 @@ from flask import current_app, request
 from flask.ext.security.decorators import _check_token
 from flask_socketio import disconnect
 from flask_socketio import emit
-from lingobarter.core.json import render_json
+from lingobarter.core.json import render_json, render_response
 from lingobarter.modules.accounts.models import User
 from lingobarter.utils import get_current_user, dateformat
 from .models import PartnerRequest, Chat, Message
@@ -71,9 +71,9 @@ def register_events(socket_io):
 
         if PartnerRequest.objects(from_id=current_user.id, to_id=ObjectId(to_id), status="pending").first():
             return emit('ret:request new partner',
-                        render_json(message='Same pending request exist! Please wait for other user', status=403))
+                        render_json(message='Same pending request exist! Please wait for other user', status=302))
 
-        PartnerRequest(from_id=current_user.id, to_id=ObjectId(to_id)).save()
+        PartnerRequest(from_id=current_user.id, to_id=ObjectId(to_id), timestamp=datetime.now()).save()
         emit('ret:request new partner', render_json(message='request successfully', status=200))
 
         room_name = current_app.socket_map.get(to_id)
@@ -104,14 +104,17 @@ def register_events(socket_io):
         add_request = PartnerRequest.objects(from_id=ObjectId(from_id), to_id=current_user.id, status="pending").first()
         if add_request is None:
             return emit('ret:add partner',
-                        render_json(message='partner request does not exist', status=404))
+                        render_json(
+                            message='partner request(from:{from_id}, to:{to_id}) does not exist'
+                                .format(from_id=from_id, to_id=str(current_user.id)),
+                            status=404))
 
         add_request.status = 'added'
         add_request.save()
         from_user.add_partner(current_user.id)
         current_user.add_partner(from_id)
         Chat(name=from_user.username + ', ' + current_user.username,
-             members=[from_user.id, current_user.id]).save()
+             members=[from_user.id, current_user.id], last_updated=datetime.now()).save()
 
         emit('ret:add partner', render_json(message='add successfully', status=200))
 
@@ -143,7 +146,10 @@ def register_events(socket_io):
         add_request = PartnerRequest.objects(from_id=ObjectId(from_id), to_id=current_user.id, status="pending").first()
         if add_request is None:
             return emit('ret:reject partner',
-                        render_json(message='partner request does not exist', status=404))
+                        render_json(
+                            message='partner request(from:{from_id}, to:{to_id}) does not exist'
+                                .format(from_id=from_id, to_id=str(current_user.id)),
+                            status=404))
 
         add_request.status = 'rejected'
         add_request.save()
@@ -213,21 +219,21 @@ def register_events(socket_io):
             callback event: ret:browse messages
         :param data: {"to_chat": ..., "page_id": ..., "page_size": ...}
         """
+        # handle bad requests
+        if data.get('to_chat') is None:
+            return emit('ret:browse messages',
+                        render_json(message='please tell me which chat you want to browse', status=400))
+        if data.get('page_id') is None:
+            return emit('ret:browse messages',
+                        render_json(message='please tell me page id', status=400))
+        if data.get('page_size') is None:
+            return emit('ret:browse messages',
+                        render_json(message='please tell me page size', status=400))
+
         # parse data
         to_chat = ObjectId(data.get('to_chat'))
         page_id = int(data.get('page_id'))
         page_size = int(data.get('page_size'))
-
-        # handle bad requests
-        if not to_chat:
-            return emit('ret:browse messages',
-                        render_json(message='please tell me which chat you want to browse', status=400))
-        if not page_id:
-            return emit('ret:browse messages',
-                        render_json(message='please tell me page id', status=400))
-        if not page_size:
-            return emit('ret:browse messages',
-                        render_json(message='please tell me page size', status=400))
 
         # if this chat does not exist
         if Chat.objects(id=to_chat).first() is None:
@@ -245,14 +251,12 @@ def register_events(socket_io):
                 'from_id': str(message.from_id),
                 'to_chat': str(message.to_chat),
                 'type': message.type,
-                'voice_file_path': message.voice_file_path if message.voice_file_path is not None else None,
-                'text_content': message.text_content if message.text_content is not None else None,
-                'image_file_path': message.image_file_path if message.image_file_path is not None else None,
+                'payload': message.text_content if message.type == 'text' else message.get_file_url(),
                 'timestamp': dateformat.datetime_to_timestamp(
                     message.timestamp) if message.timestamp is not None else None
             }
             ret.append(temp)
-        emit('ret:browse messages', ret)
+        emit('ret:browse messages', render_response(ret))
 
     @socket_io.on('fetch undelivered messages')
     @authenticated_only
@@ -262,29 +266,29 @@ def register_events(socket_io):
             callback event: ret:fetch undelivered messages
         """
         current_user = get_current_user()
-        chats_list = Chat.objects(members=current_user.id)
+        chats_list = [chat.id for chat in Chat.objects(members=current_user.id).only('_id')]
         ret = {}  # store result
 
-        for chat in chats_list:
-            messages_list = Message.objects(to_chat=chat.id).order_by('-timestamp')  # get all related messages
-            messages_of_one_chat = []  # store messages that have not been delivered to current user in one chat
-            for message in messages_list:
-                if current_user.id in message.undelivered:  # if this message has not been delivered to current user
-                    temp_message = {
-                        'from_id': str(message.from_id),
-                        'to_chat': str(message.to_chat),
-                        'type': message.type,
-                        'voice_file_path': message.voice_file_path if message.voice_file_path is not None else None,
-                        'text_content': message.text_content if message.text_content is not None else None,
-                        'image_file_path': message.image_file_path if message.image_file_path is not None else None,
-                        'timestamp': dateformat.datetime_to_timestamp(
-                            message.timestamp) if message.timestamp is not None else None
-                    }
-                    messages_of_one_chat.append(temp_message)  # fetch message
-            if messages_of_one_chat:  # if there is any undelivered message in this chat
-                ret[str(chat.to_chat)] = messages_of_one_chat  # fetch this chat
+        messages_list = Message.objects(to_chat__in=chats_list, undelivered=current_user.id).order_by('-timestamp')  # get all related messages
 
-        emit('ret:fetch undelivered messages', ret)
+        for message in messages_list:
+            temp_message = {
+                'from_id': str(message.from_id),
+                'to_chat': str(message.to_chat),
+                'type': message.type,
+                'payload': message.text_content if message.type == 'text' else message.get_file_url(),
+                'timestamp': dateformat.datetime_to_timestamp(
+                    message.timestamp) if message.timestamp is not None else None
+            }
+
+            if ret.get(str(message.to_chat)) is None:
+                ret[str(message.to_chat)] = []
+
+            ret[str(message.to_chat)].append(temp_message)  # fetch message
+            message.undelivered.remove(current_user.id)
+            message.save()
+
+        emit('ret:fetch undelivered messages', render_response(ret))
 
     @socket_io.on('send message')
     @authenticated_only
@@ -303,14 +307,19 @@ def register_events(socket_io):
         current_user = get_current_user()
         current_chat = Chat.get_chat_by_id(data['to_chat'])
 
+        if not current_chat:
+            return emit('ret:send message',
+                        render_json(message="The chat:" + data['to_chat'] + " does not exist", status=404))
+
         if current_user.id not in current_chat.members:
-            return emit('ret:send message', render_json(message="You do not belong to this chat", status=403))
+            return emit('ret:send message',
+                        render_json(message="You do not belong to this chat:" + data['to_chat'], status=403))
 
         online_set = set([ObjectId(user) for user in current_app.socket_map.get_all_users()])
         member_set = set(current_chat.members)
         offline_set = member_set - online_set
 
-        message = Message(from_id=current_user.id, to_chat=ObjectId(data['to_chat']))
+        message = Message(from_id=current_user.id, to_chat=ObjectId(data['to_chat']), timestamp=datetime.now())
         message.undelivered = list(offline_set)
         message.type = data['type']
         if data['type'] == 'text':
