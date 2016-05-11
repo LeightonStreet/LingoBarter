@@ -9,7 +9,7 @@ from dateutil.relativedelta import relativedelta
 from flask import request
 from flask_restful import Resource
 from flask_security import auth_token_required
-from lingobarter.core.json import render_json
+from lingobarter.core.json import render_response
 from lingobarter.utils import get_current_user
 from ..accounts.models import User
 
@@ -236,4 +236,4 @@ class SearchResource(Resource):
         for acceptable_user in acceptable_users:
             acceptable_users_profiles.append(User.get_other_profile(acceptable_user.username))
 
-        return render_json(message='Successfully search users.', status=200, response=acceptable_users_profiles)
+        return render_response(acceptable_users_profiles)
