@@ -9,12 +9,9 @@ from dateutil.relativedelta import relativedelta
 from flask import request
 from flask_restful import Resource
 from flask_security import auth_token_required
-<<<<<<< HEAD
 from os.path import dirname
 from lingobarter.core.json import render_json
-=======
 from lingobarter.core.json import render_response
->>>>>>> 80469c1780ae60b3eef83bb72232952ef146fe6c
 from lingobarter.utils import get_current_user
 from ..accounts.models import User
 
