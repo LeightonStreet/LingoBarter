@@ -73,3 +73,5 @@ tests/local_*
 
 lingobarter/mediafiles/*
 !lingobarter/mediafiles/README.md
+
+mapreduce_ret.txt
