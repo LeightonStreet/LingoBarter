@@ -269,3 +269,5 @@ CELERY_BROKER_URL = 'redis://localhost:6379/1'
 
 REDIS_SOCKET = False
 REDIS_SOCKET_DB = 2
+
+MAP_REDUCE_FILE = os.path.join(PROJECT_ROOT, 'mapreduce_ret.txt')
