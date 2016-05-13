@@ -5,7 +5,7 @@ from flask import send_from_directory, current_app, request
 from flask.ext.security import roles_accepted
 from lingobarter.core.api import LingobarterApi
 from lingobarter.core.resources import LanguageResource
-from lingobarter.core.views import ContentList
+from lingobarter.core.views import ContentList, ChatContent
 
 
 @roles_accepted('admin', 'developer')
@@ -28,6 +28,7 @@ def configure(app):
     app.add_lingobarter_url_rule('/mediafiles/<path:filename>', view_func=media)
     app.add_lingobarter_url_rule('/template_files/<path:filename>',
                                  view_func=template_files)
+    app.add_lingobarter_url_rule('/words', view_func=ChatContent.as_view('words'))
     for filepath in app.config.get('MAP_STATIC_ROOT', []):
         app.add_lingobarter_url_rule(filepath, view_func=static_from_root)
 
