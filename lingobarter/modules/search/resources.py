@@ -9,10 +9,11 @@ from dateutil.relativedelta import relativedelta
 from flask import request
 from flask_restful import Resource
 from flask_security import auth_token_required
+from os.path import dirname
+from lingobarter.core.json import render_json
 from lingobarter.core.json import render_response
 from lingobarter.utils import get_current_user
 from ..accounts.models import User
-
 
 # in database: teach_langs is what I want to teach , and learn_langs is what I want to learn
 
@@ -235,5 +236,24 @@ class SearchResource(Resource):
         acceptable_users_profiles = []
         for acceptable_user in acceptable_users:
             acceptable_users_profiles.append(User.get_other_profile(acceptable_user.username))
-
         return render_response(acceptable_users_profiles)
+
+
+class ContentResource(Resource):
+    @auth_token_required
+    def post(self):
+        user = get_current_user()
+
+        data = json.loads(request.data, object_hook=json_util.object_hook)
+        if data.get('content') is None:
+            return render_json(message='Please give me content', status=400)
+        else:
+            # append to file
+            print data['content']
+            print type(str(data['content']))
+            print str(data['content'])
+            with open(dirname(__file__) + "/../../mediafiles/" + user.username + "_chat_contents.txt", 'a') as chat_log:
+                chat_log.write(str(data['content']) + " ")
+
+            return render_json(message='Successfully get content', status=200)
+
