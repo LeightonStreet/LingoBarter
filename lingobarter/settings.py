@@ -148,7 +148,7 @@ SECURITY_TRACKABLE = True
 
 # Security URL Configuration
 SECURITY_REGISTER_URL = '/signup'
-SECURITY_POST_CONFIRM_VIEW = '/accounts/profile/edit'
+SECURITY_POST_CONFIRM_VIEW = '/'
 
 # Configurations below should be changes in local_settings
 # when email system got setted up

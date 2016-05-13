@@ -9,8 +9,12 @@ from dateutil.relativedelta import relativedelta
 from flask import request
 from flask_restful import Resource
 from flask_security import auth_token_required
+<<<<<<< HEAD
 from os.path import dirname
 from lingobarter.core.json import render_json
+=======
+from lingobarter.core.json import render_response
+>>>>>>> 80469c1780ae60b3eef83bb72232952ef146fe6c
 from lingobarter.utils import get_current_user
 from ..accounts.models import User
 
@@ -235,8 +239,7 @@ class SearchResource(Resource):
         acceptable_users_profiles = []
         for acceptable_user in acceptable_users:
             acceptable_users_profiles.append(User.get_other_profile(acceptable_user.username))
-
-        return render_json(message='Successfully search users.', status=200, response=acceptable_users_profiles)
+        return render_response(acceptable_users_profiles)
 
 
 class ContentResource(Resource):
@@ -256,3 +259,4 @@ class ContentResource(Resource):
                 chat_log.write(str(data['content']) + " ")
 
             return render_json(message='Successfully get content', status=200)
+
