@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Word Cloud</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+    <script src="http://www.goat1000.com/tagcanvas.min.js?2.9"></script>
+    <style>
+        #myCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+    <script type="text/javascript">
+        window.onload = function () {
+            try {
+                TagCanvas.interval = 20;
+                TagCanvas.textFont = 'Impact,Arial Black,sans-serif';
+                TagCanvas.textColour = '#00f';
+                TagCanvas.textHeight = 25;
+                TagCanvas.outlineColour = '#f96';
+                TagCanvas.outlineThickness = 5;
+                TagCanvas.maxSpeed = 0.04;
+                TagCanvas.minBrightness = 0.1;
+                TagCanvas.depth = 0.92;
+                TagCanvas.pulsateTo = 0.2;
+                TagCanvas.pulsateTime = 0.75;
+                TagCanvas.initial = [0.1, -0.1];
+                TagCanvas.decel = 0.98;
+                TagCanvas.reverse = true;
+                TagCanvas.hideTags = false;
+                TagCanvas.shadow = '#ccf';
+                TagCanvas.shadowBlur = 3;
+                TagCanvas.weight = true;
+                TagCanvas.weightFrom = 'data-weight';
+                TagCanvas.clickToFront = 600;
+                // set colour of text and outline of active tag
+                TagCanvas.Start('myCanvas');
+            } catch (e) {
+                // something went wrong, hide the canvas container
+                document.getElementById('myCanvasContainer').style.display = 'none';
+            }
+        };
+    </script>
+</head>
+<body>
+<div id="myCanvasContainer">
+    <canvas width="300" height="300" id="myCanvas">
+        <ul>
+            {% for key, value in frequency_map.iteritems() %}
+                <li><a data-weight="{{ value }}" href="#">{{ key }}</a></li>
+            {% endfor %}
+        </ul>
+    </canvas>
+</div>
+</body>
+</html>
